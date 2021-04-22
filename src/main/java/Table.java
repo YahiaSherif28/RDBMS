@@ -10,8 +10,7 @@ import java.util.Map;
 import java.util.Vector;
 
 public class Table implements Serializable {
-    private static Integer maxSize;
-    private Vector<Page> pages;
+    public Vector<Page> pages;
 
     private String tableName ;
     private Integer indexOfClusteringKey;
@@ -29,6 +28,8 @@ public class Table implements Serializable {
             colNames.add(e.getKey());
         }
 
+        indexOfClusteringKey = colNames.indexOf(clusteringKey);
+
         colTypes = new Vector<>();
         colMin = new Vector<>();
         colMax = new Vector<>();
@@ -36,7 +37,7 @@ public class Table implements Serializable {
             colTypes.add(colNameType.get(name));
             String strColType =colNameType.get(name);
             Class myClass = Class.forName(strColType);
-            Constructor myConstructor = myClass.getConstructor();
+            Constructor myConstructor = myClass.getConstructor(String.class);
             Comparable myMin = (Comparable) myConstructor.newInstance(colNameMin.get(name));
             Comparable myMax = (Comparable) myConstructor.newInstance(colNameMax.get(name));
             colMin.add(myMin);
@@ -44,11 +45,41 @@ public class Table implements Serializable {
         }
     }
 
+    public void insertTuple(Hashtable<String, Object> colNameValue) throws DBAppException {
+        Vector<Comparable> newTupleVector = new Vector();
+        for(int i = 0; i < colNames.size(); i++) {
+            String colName = colNames.get(i);
+            Comparable value = (Comparable) colNameValue.get(colName);
+            if(value == null) {
+              if(i == indexOfClusteringKey)
+                  throw new DBAppException("No value was inserted for the primary key.");
+              else
+                  newTupleVector.add(null);
+            } else {
+                String enteredType = value.getClass().getName();
+                if (!colTypes.get(i).equals(enteredType))
+                    throw new DBAppException(String.format("The type of column %s is %s, but the entered type is %s.", colName, colTypes.get(i), enteredType));
+                if (value.compareTo(colMin.get(i)) < 0 || value.compareTo(colMax.get(i)) > 0)
+                    throw new DBAppException(String.format("The value for column %s is not between the min and the max.", colName));
+                newTupleVector.add(value);
+            }
+        }
+
+        try {
+            add(new Tuple(newTupleVector, indexOfClusteringKey));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void add(Tuple row) throws IOException, ClassNotFoundException {
         if(pages.isEmpty()) {
-            Page newPage = new Page(DBApp.getNextPageName(), maxSize);
+            Page newPage = new Page(DBApp.getNextPageName());
             newPage.getData().add(row);
             newPage.closePage();
+            pages.add(newPage);
             return;
         }
         int insertionIndex = binarySearch(row.getPK());
@@ -81,4 +112,7 @@ public class Table implements Serializable {
         return tableName;
     }
 
+    public String toString() {
+        return pages.toString();
+    }
 }

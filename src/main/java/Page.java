@@ -9,10 +9,10 @@ public class Page implements Serializable {
     private Integer maxSize;
     private Integer curSize;
 
-    public Page(String fileName, int maxSize) {
+    public Page(String fileName) {
         data = new Vector();
         this.fileName = fileName;
-        this.maxSize = maxSize;
+        this.maxSize = DBApp.getMaximumRowsCountinTablePage();
         curSize = 0;
     }
 
@@ -68,7 +68,7 @@ public class Page implements Serializable {
 
     public Page split() throws IOException, ClassNotFoundException {
         loadPage();
-        Page newPage = new Page(DBApp.getNextPageName(), maxSize);
+        Page newPage = new Page(DBApp.getNextPageName());
         int mid = data.size() / 2;
         while (data.size() > mid) {
             newPage.getData().add(data.remove(data.size() - 1));
@@ -82,4 +82,20 @@ public class Page implements Serializable {
         return curSize == maxSize;
     }
 
+    public String toString() {
+        try {
+            loadPage();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        String s = fileName + "\n" + data.toString();
+        try {
+            closePage();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return s;
+    }
 }

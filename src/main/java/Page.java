@@ -1,5 +1,7 @@
 import java.io.*;
 import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.Vector;
 
 public class Page implements Serializable {
@@ -9,15 +11,14 @@ public class Page implements Serializable {
     private Integer maxSize;
     private Integer curSize;
 
-    public Page(String fileName, int maxSize) {
+    public Page(String fileName) {
         data = new Vector();
         this.fileName = fileName;
-        this.maxSize = maxSize;
+        this.maxSize = DBApp.getMaximumRowsCountinTablePage();
         curSize = 0;
     }
 
-    public Vector<Tuple> getData() {
-        return data;
+    public Vector<Tuple> getData() {return data;
     }
 
     public void setData(Vector<Tuple> data) {
@@ -55,31 +56,114 @@ public class Page implements Serializable {
         data = null;
     }
 
-    public void add(Tuple row) throws IOException, ClassNotFoundException {
+    public void add(Tuple row) throws IOException, ClassNotFoundException, DBAppException {
         loadPage();
         int index = Collections.binarySearch(data, row);
         if (index < 0) {
             index = -index - 1;
+        }else{
+            //throw new DBAppException("PrimaryKey already eixsts");
         }
         data.add(index, row);
         closePage();
-        curSize++;
     }
 
     public Page split() throws IOException, ClassNotFoundException {
         loadPage();
-        Page newPage = new Page(DBApp.getNextPageName(), maxSize);
+        Page newPage = new Page(DBApp.getNextPageName());
         int mid = data.size() / 2;
         while (data.size() > mid) {
             newPage.getData().add(data.remove(data.size() - 1));
         }
+        Collections.reverse(newPage.getData());
         closePage();
         newPage.closePage();
         return newPage;
     }
 
+    public void update (Comparable key , Hashtable<Integer, Comparable> colNameVal)  {
+
+        try {
+            loadPage();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        int l =0;
+        int h = data.size()-1;
+        int id =-1;
+        while(l<=h){
+            int mid = (l+h)/2;
+            if(data.get(mid).getPK().compareTo(key) <= 0 ) {
+                if(data.get(mid).getPK().compareTo(key)==0)id = mid;
+                l = mid+1;
+            }else{
+                h = mid-1;
+            }
+        }
+
+        if(id ==-1) return;
+
+        for(Map.Entry<Integer,Comparable> e:colNameVal.entrySet()){
+            data.get(id).vector.set(e.getKey(),  e.getValue());
+        }
+
+
+        try {
+            closePage();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteTuples ( Hashtable<Integer,Comparable> colNameVal) {
+        try {
+            loadPage();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Vector<Tuple> newData = new Vector<>();
+        for (Tuple t : data ){
+          boolean f = true;
+          for(Map.Entry<Integer,Comparable> e : colNameVal.entrySet()){
+              f&= t.vector.get(e.getKey()).compareTo(e.getValue())==0;
+          }
+          if(!f) newData.add(t);
+        }
+
+        data = newData;
+        try {
+            closePage();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public boolean isFull() {
-        return curSize == maxSize;
+        return curSize.equals(maxSize);
+    }
+
+
+    public boolean isEmpty() {
+        return curSize == 0;
+    }
+
+    public String toString() {
+        try {
+            loadPage();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        String s = fileName + "\n" + data.toString();
+        try {
+            closePage();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return s;
     }
 
 }

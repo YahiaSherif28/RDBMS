@@ -1,24 +1,21 @@
 import javax.management.ObjectInstance;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.PrivateKey;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 public class Table implements Serializable {
-    private static Integer maxSize;
-    private Vector<Page> pages;
+    private static final String TABLES_FILE_PATH = "src/main/resources/tables/";
 
-    private String tableName ;
-    private Integer indexOfClusteringKey;
-    private Vector<String> colNames;
-    private Vector<String> colTypes;
-    private Vector<Comparable> colMin;
-    private Vector<Comparable> colMax;
+    private String tableName;
+    transient private Vector<Page> pages;
+    transient private Integer indexOfClusteringKey;
+    transient private Vector<String> colNames;
+    transient private TreeMap<String,Integer> colNameId;
+    transient private Vector<String> colTypes;
+    transient private Vector<Comparable> colMin;
+    transient private Vector<Comparable> colMax;
 
     public Table(String tableName, String clusteringKey, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin, Hashtable<String, String> colNameMax ) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
         this.tableName = tableName;
@@ -29,26 +26,94 @@ public class Table implements Serializable {
             colNames.add(e.getKey());
         }
 
+        indexOfClusteringKey = colNames.indexOf(clusteringKey);
+
         colTypes = new Vector<>();
         colMin = new Vector<>();
         colMax = new Vector<>();
+        colNameId = new TreeMap<>();
+        int id =0;
         for(String name : colNames){
-            colTypes.add(colNameType.get(name));
-            String strColType =colNameType.get(name);
+            String type = colNameType.get(name);
+            if(type.equals("java.lang.String"))
+                type = "MyString";
+            colTypes.add(type);
+            colNameId.put(name,id++);
+            String strColType = type;
             Class myClass = Class.forName(strColType);
-            Constructor myConstructor = myClass.getConstructor();
-            Comparable myMin = (Comparable) myConstructor.newInstance(colNameMin.get(name));
-            Comparable myMax = (Comparable) myConstructor.newInstance(colNameMax.get(name));
+            Constructor myConstructor = myClass.getConstructor(String.class);
+            Comparable myMin = null;
+            Comparable myMax = null;
+            if(strColType.equals("java.util.Date")){
+                String min = colNameMin.get(name);
+                int year = Integer.parseInt(min.trim().substring(0, 4));
+                int month = Integer.parseInt(min.trim().substring(5, 7));
+                int day = Integer.parseInt(min.trim().substring(8));
+
+                Date mindate = new Date(year - 1900, month - 1, day);
+
+                String max = colNameMax.get(name);
+                year = Integer.parseInt(max.trim().substring(0, 4));
+                month = Integer.parseInt(max.trim().substring(5, 7));
+                day = Integer.parseInt(max.trim().substring(8));
+
+                Date maxdate = new Date(year - 1900, month - 1, day);
+                myMin = mindate;
+                myMax = maxdate;
+
+            }else{
+                myMin = (Comparable) myConstructor.newInstance(colNameMin.get(name));
+                myMax = (Comparable) myConstructor.newInstance(colNameMax.get(name));}
             colMin.add(myMin);
             colMax.add(myMax);
         }
+        try {
+            closeTable();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //   System.out.println(tableName);
     }
 
-    public void add(Tuple row) throws IOException, ClassNotFoundException {
+    public void loadTable() throws IOException, ClassNotFoundException {
+        ObjectInputStream oi = new ObjectInputStream(new FileInputStream(TABLES_FILE_PATH + tableName + ".class"));
+        pages = (Vector<Page>) oi.readObject();
+        indexOfClusteringKey = (Integer) oi.readObject();
+        colNames = (Vector<String>) oi.readObject();
+        colNameId = (TreeMap<String, Integer>) oi.readObject();
+        colTypes = (Vector<String>) oi.readObject();
+        colMin = (Vector<Comparable>) oi.readObject();
+        colMax = (Vector<Comparable>) oi.readObject();
+        oi.close();
+    }
+
+    public void closeTable() throws IOException {
+        ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(TABLES_FILE_PATH + tableName + ".class"));
+        os.writeObject(pages);
+        os.writeObject(indexOfClusteringKey);
+        os.writeObject(colNames);
+        os.writeObject(colNameId);
+        os.writeObject(colTypes);
+        os.writeObject(colMin);
+        os.writeObject(colMax);
+
+        pages = null;
+        indexOfClusteringKey = null;
+        colNames = null;
+        colNameId = null;
+        colTypes = null;
+        colMin = null;
+        colMax = null;
+
+        os.close();
+    }
+
+    public void add(Tuple row) throws IOException, ClassNotFoundException, DBAppException {
         if(pages.isEmpty()) {
-            Page newPage = new Page(DBApp.getNextPageName(), maxSize);
+            Page newPage = new Page(DBApp.getNextPageName());
             newPage.getData().add(row);
             newPage.closePage();
+            pages.add(newPage);
             return;
         }
         int insertionIndex = binarySearch(row.getPK());
@@ -58,6 +123,114 @@ public class Table implements Serializable {
             pages.add(insertionIndex + 1, newPage);
         } else {
             pages.get(insertionIndex).add(row);
+        }
+    }
+
+    public void insertTuple(Hashtable<String, Object> colNameValue) throws DBAppException {
+        try {
+            loadTable();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        Vector<Comparable> newTupleVector = new Vector();
+        for(int i = 0; i < colNames.size(); i++) {
+            String colName = colNames.get(i);
+            Comparable value = (Comparable) colNameValue.get(colName);
+            if(value == null) {
+                if(i == indexOfClusteringKey)
+                    throw new DBAppException("No value was inserted for the primary key.");
+                else
+                    newTupleVector.add(null);
+            } else {
+                String enteredType = value.getClass().getName();
+                if (!colTypes.get(i).equals(enteredType))
+                    throw new DBAppException(String.format("The type of column %s is %s, but the entered type is %s.", colName, colTypes.get(i), enteredType));
+                if (value.compareTo(colMin.get(i)) < 0 || value.compareTo(colMax.get(i)) > 0)
+                    throw new DBAppException(String.format("The value for column %s is not between the min and the max. %s %s %s", colName, value, colMin.get(i), colMax.get(i)));
+                newTupleVector.add(value);
+            }
+        }
+
+        try {
+            add(new Tuple(newTupleVector, indexOfClusteringKey));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        try {
+            closeTable();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateTuple (String clusteringKeyValue , Hashtable<String, Object> colNameValue) {
+        try {
+            loadTable();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        String type = colTypes.get(indexOfClusteringKey) ;
+
+        Class myClass = null;
+        Constructor myConstructor = null ;
+        Comparable key = null ;
+
+        try {
+            myClass = Class.forName(type);
+            myConstructor = myClass.getConstructor(String.class);
+            key = (Comparable) myConstructor.newInstance(clusteringKeyValue);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int pageIndex = binarySearch(key) ;
+        Page p = pages.get(pageIndex) ;
+        Hashtable<Integer,Comparable> colNameVal = new Hashtable<Integer , Comparable>();
+        for (Map.Entry e:colNameValue.entrySet()){
+            int id = colNameId.get(e.getKey());
+            Comparable val = (Comparable) e.getValue();
+            colNameVal.put(id,val);
+        }
+        p.update( key , colNameVal)  ;
+        try {
+            closeTable();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteTuple (Hashtable<String, Object> columnNameValue ){
+        try {
+            loadTable();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        Hashtable<Integer,Comparable> colNameVal = new Hashtable<Integer , Comparable>();
+        for (Map.Entry e:columnNameValue.entrySet()){
+            int id = colNameId.get(e.getKey());
+            Comparable val = (Comparable) e.getValue();
+            colNameVal.put(id,val);
+        }
+        Vector<Page> newPages = new Vector<>();
+        for (Page p : pages ){
+            p.deleteTuples(colNameVal) ;
+            if(!p.isEmpty() ) {
+                newPages.add(p);
+            }
+        }
+        pages = newPages;
+        try {
+            closeTable();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -81,4 +254,7 @@ public class Table implements Serializable {
         return tableName;
     }
 
+    public String toString() {
+        return pages.toString();
+    }
 }

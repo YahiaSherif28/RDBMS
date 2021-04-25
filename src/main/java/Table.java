@@ -39,8 +39,28 @@ public class Table implements Serializable {
             String strColType =colNameType.get(name);
             Class myClass = Class.forName(strColType);
             Constructor myConstructor = myClass.getConstructor(String.class);
-            Comparable myMin = (Comparable) myConstructor.newInstance(colNameMin.get(name));
-            Comparable myMax = (Comparable) myConstructor.newInstance(colNameMax.get(name));
+            Comparable myMin = null;
+            Comparable myMax = null;
+            if(strColType.equals("java.util.Date")){
+                String min = colNameMin.get(name);
+                int year = Integer.parseInt(min.trim().substring(0, 4));
+                int month = Integer.parseInt(min.trim().substring(5, 7));
+                int day = Integer.parseInt(min.trim().substring(8));
+
+                Date mindate = new Date(year - 1900, month - 1, day);
+
+                String max = colNameMin.get(name);
+                 year = Integer.parseInt(max.trim().substring(0, 4));
+                 month = Integer.parseInt(max.trim().substring(5, 7));
+                 day = Integer.parseInt(max.trim().substring(8));
+
+                Date maxdate = new Date(year - 1900, month - 1, day);
+                 myMin = mindate;
+                 myMax = mindate;
+
+            }else{
+             myMin = (Comparable) myConstructor.newInstance(colNameMin.get(name));
+             myMax = (Comparable) myConstructor.newInstance(colNameMax.get(name));}
             colMin.add(myMin);
             colMax.add(myMax);
         }

@@ -4,10 +4,7 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.PrivateKey;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 public class Table implements Serializable {
     public Vector<Page> pages;
@@ -15,6 +12,7 @@ public class Table implements Serializable {
     private String tableName ;
     private Integer indexOfClusteringKey;
     private Vector<String> colNames;
+    private TreeMap<String,Integer> colNameId;
     private Vector<String> colTypes;
     private Vector<Comparable> colMin;
     private Vector<Comparable> colMax;
@@ -33,8 +31,11 @@ public class Table implements Serializable {
         colTypes = new Vector<>();
         colMin = new Vector<>();
         colMax = new Vector<>();
+        colNameId = new TreeMap<>();
+        int id =0;
         for(String name : colNames){
             colTypes.add(colNameType.get(name));
+            colNameId.put(name,id++);
             String strColType =colNameType.get(name);
             Class myClass = Class.forName(strColType);
             Constructor myConstructor = myClass.getConstructor(String.class);
@@ -43,6 +44,7 @@ public class Table implements Serializable {
             colMin.add(myMin);
             colMax.add(myMax);
         }
+     //   System.out.println(tableName);
     }
 
     public void insertTuple(Hashtable<String, Object> colNameValue) throws DBAppException {
@@ -74,7 +76,50 @@ public class Table implements Serializable {
         }
     }
 
-    public void add(Tuple row) throws IOException, ClassNotFoundException {
+    public void updateTuple (String clusteringKeyValue , Hashtable<String, Object> colNameValue) {
+        String type = colTypes.get(indexOfClusteringKey) ;
+
+        Class myClass = null;
+        Constructor myConstructor = null ;
+        Comparable key = null ;
+
+        try {
+            myClass = Class.forName(type);
+            myConstructor = myClass.getConstructor(String.class);
+            key = (Comparable) myConstructor.newInstance(clusteringKeyValue);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int pageIndex = binarySearch(key) ;
+        Page p = pages.get(pageIndex) ;
+        Hashtable<Integer,Comparable> colNameVal = new Hashtable<Integer , Comparable>();
+        for (Map.Entry e:colNameValue.entrySet()){
+            int id = colNameId.get(e.getKey());
+            Comparable val = (Comparable) e.getValue();
+            colNameVal.put(id,val);
+        }
+        p.update( key , colNameVal)  ;
+    }
+
+    public void deleteTuple (Hashtable<String, Object> columnNameValue ){
+
+        Hashtable<Integer,Comparable> colNameVal = new Hashtable<Integer , Comparable>();
+        for (Map.Entry e:columnNameValue.entrySet()){
+            int id = colNameId.get(e.getKey());
+            Comparable val = (Comparable) e.getValue();
+            colNameVal.put(id,val);
+        }
+        Vector<Page> newPages = new Vector<>();
+        for (Page p : pages ){
+            p.deleteTuples(colNameVal) ;
+            if(!p.isEmpty() ) {
+                newPages.add(p);
+            }
+        }
+        pages = newPages;
+    }
+    public void add(Tuple row) throws IOException, ClassNotFoundException, DBAppException {
         if(pages.isEmpty()) {
             Page newPage = new Page(DBApp.getNextPageName());
             newPage.getData().add(row);
@@ -107,6 +152,7 @@ public class Table implements Serializable {
         }
         return Math.max(ans - 1, 0);
     }
+
 
     public String getTableName() {
         return tableName;

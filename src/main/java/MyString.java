@@ -12,12 +12,11 @@ public class MyString implements Comparable<MyString>, Serializable {
     }
 
     public int compareTo(MyString string) {
-        if(this.length() == string.length())
+        if (this.length() == string.length())
             return this.s.compareTo(string.s);
         return this.length() - string.length();
     }
-
-    public static void main(String[] args) {
-        System.out.println(MyString.class.getName().toString());
+    public String toString() {
+        return s;
     }
 }

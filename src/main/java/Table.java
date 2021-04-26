@@ -6,7 +6,7 @@ import java.security.PrivateKey;
 import java.util.*;
 
 public class Table implements Serializable {
-    private static final String TABLES_FILE_PATH = "src/main/resources/tables/";
+    private static final String TABLES_FILE_PATH = "src/main/resources/data/tables/";
 
     private String tableName;
     transient private Vector<Page> pages;
@@ -144,7 +144,7 @@ public class Table implements Serializable {
         }
     }
 
-    public void updateTuple(String clusteringKeyValue, Hashtable<String, Object> colNameValue) {
+    public void updateTuple(String clusteringKeyValue, Hashtable<String, Object> colNameValue) throws DBAppException {
         try {
             loadTable();
         } catch (IOException e) {
@@ -167,6 +167,10 @@ public class Table implements Serializable {
         for (Map.Entry e : colNameValue.entrySet()) {
             int id = colNameId.get(e.getKey());
             Comparable val = (Comparable) e.getValue();
+            Comparable min = colMin.get(id);
+            Comparable max = colMax.get(id);
+            if (val.compareTo(min) < 0 || val.compareTo(max) > 0)
+                throw new DBAppException(String.format("Update Failed. Column %s has min Value %s and max Value%s. Can't update value to %s", e.getKey(), min.toString(), max.toString(), val.toString()));
             colNameVal.put(id, val);
         }
         p.update(key, colNameVal);

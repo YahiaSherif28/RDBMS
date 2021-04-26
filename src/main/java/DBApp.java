@@ -1,14 +1,11 @@
-import javax.lang.model.element.Name;
 import java.io.*;
-import java.lang.reflect.Constructor;
-import java.net.StandardSocketOptions;
 import java.util.*;
 
 public class DBApp implements DBAppInterface {
-    private static final String NEXT_PAGE_NAME_FILE = "nextPageName.class";
-    private static final String PAGES_FILE_PATH = "src/main/resources/data/";
+    private static final String NEXT_PAGE_NAME_PATH = "src/main/resources/data/nextPageName.class";
+    private static final String PAGES_FILE_PATH = "src/main/resources/data/pages/";
     private static final String RESOURCES_PATH = "src/main/resources/";
-    private static final String TABLES_FILE = "tables.class";
+    private static final String TABLES_FILE_PATH = "src/main/resources/data/tables.class";
     private static final String CONFIG_FILE = "DBApp.config";
     private static Integer MaximumRowsCountinTablePage;
     private static Integer MaximumKeysCountinIndexBucket;
@@ -56,11 +53,11 @@ public class DBApp implements DBAppInterface {
     }
 
     private static int getNextPageNameAsInt() throws IOException {
-        ObjectInputStream oi = new ObjectInputStream(new FileInputStream(RESOURCES_PATH + NEXT_PAGE_NAME_FILE));
+        ObjectInputStream oi = new ObjectInputStream(new FileInputStream(NEXT_PAGE_NAME_PATH));
         Integer nextPageName = oi.readInt();
         nextPageName++;
         oi.close();
-        ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(RESOURCES_PATH + NEXT_PAGE_NAME_FILE));
+        ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(NEXT_PAGE_NAME_PATH));
         os.writeInt(nextPageName);
         os.close();
         return nextPageName;
@@ -73,7 +70,7 @@ public class DBApp implements DBAppInterface {
     public void reserialize() {
         ObjectOutputStream os = null;
         try {
-            os = new ObjectOutputStream(new FileOutputStream(RESOURCES_PATH + TABLES_FILE));
+            os = new ObjectOutputStream(new FileOutputStream(TABLES_FILE_PATH));
             os.writeObject(tables);
             os.close();
         } catch (Exception e) {
@@ -95,19 +92,19 @@ public class DBApp implements DBAppInterface {
 
 
         try {
-            ObjectInputStream oi = new ObjectInputStream(new FileInputStream(RESOURCES_PATH + TABLES_FILE));
+            ObjectInputStream oi = new ObjectInputStream(new FileInputStream(TABLES_FILE_PATH));
             tables = (Vector<Table>) oi.readObject();
             oi.close();
         } catch (Exception e) {
             tables = new Vector<>();
         }
         try {
-            ObjectInputStream oi = new ObjectInputStream(new FileInputStream(RESOURCES_PATH + NEXT_PAGE_NAME_FILE));
+            ObjectInputStream oi = new ObjectInputStream(new FileInputStream(NEXT_PAGE_NAME_PATH));
             oi.readInt();
             oi.close();
         } catch (Exception e) {
             try {
-                ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(RESOURCES_PATH + NEXT_PAGE_NAME_FILE));
+                ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(NEXT_PAGE_NAME_PATH));
                 os.writeInt(0);
                 os.close();
             } catch (Exception e1) {
@@ -183,9 +180,7 @@ public class DBApp implements DBAppInterface {
                     table.updateTuple(clusteringKeyValue,columnNameValue);
                 return;
             }
-
         throw new DBAppException("This table doesn't exist");
-
     }
 
     @Override

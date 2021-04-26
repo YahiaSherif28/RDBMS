@@ -5,7 +5,7 @@ public interface DBAppInterface {
 
     void init();
 
-    void createTable(String tableName, String clusteringKey, Hashtable<String,String> colNameType, Hashtable<String,String> colNameMin, Hashtable<String,String> colNameMax) throws DBAppException;
+    void createTable(String tableName, String clusteringKey, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin, Hashtable<String, String> colNameMax) throws DBAppException;
 
     void createIndex(String tableName, String[] columnNames) throws DBAppException;
 

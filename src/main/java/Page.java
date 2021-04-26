@@ -18,7 +18,8 @@ public class Page implements Serializable {
         curSize = 0;
     }
 
-    public Vector<Tuple> getData() {return data;
+    public Vector<Tuple> getData() {
+        return data;
     }
 
     public void setData(Vector<Tuple> data) {
@@ -61,7 +62,7 @@ public class Page implements Serializable {
         int index = Collections.binarySearch(data, row);
         if (index < 0) {
             index = -index - 1;
-        }else{
+        } else {
             //throw new DBAppException("PrimaryKey already eixsts");
         }
         data.add(index, row);
@@ -81,7 +82,7 @@ public class Page implements Serializable {
         return newPage;
     }
 
-    public void update (Comparable key , Hashtable<Integer, Comparable> colNameVal)  {
+    public void update(Comparable key, Hashtable<Integer, Comparable> colNameVal) {
 
         try {
             loadPage();
@@ -90,23 +91,23 @@ public class Page implements Serializable {
         }
 
 
-        int l =0;
-        int h = data.size()-1;
-        int id =-1;
-        while(l<=h){
-            int mid = (l+h)/2;
-            if(data.get(mid).getPK().compareTo(key) <= 0 ) {
-                if(data.get(mid).getPK().compareTo(key)==0)id = mid;
-                l = mid+1;
-            }else{
-                h = mid-1;
+        int l = 0;
+        int h = data.size() - 1;
+        int id = -1;
+        while (l <= h) {
+            int mid = (l + h) / 2;
+            if (data.get(mid).getPK().compareTo(key) <= 0) {
+                if (data.get(mid).getPK().compareTo(key) == 0) id = mid;
+                l = mid + 1;
+            } else {
+                h = mid - 1;
             }
         }
 
-        if(id ==-1) return;
+        if (id == -1) return;
 
-        for(Map.Entry<Integer,Comparable> e:colNameVal.entrySet()){
-            data.get(id).vector.set(e.getKey(),  e.getValue());
+        for (Map.Entry<Integer, Comparable> e : colNameVal.entrySet()) {
+            data.get(id).vector.set(e.getKey(), e.getValue());
         }
 
 
@@ -117,19 +118,19 @@ public class Page implements Serializable {
         }
     }
 
-    public void deleteTuples ( Hashtable<Integer,Comparable> colNameVal) {
+    public void deleteTuples(Hashtable<Integer, Comparable> colNameVal) {
         try {
             loadPage();
         } catch (Exception e) {
             e.printStackTrace();
         }
         Vector<Tuple> newData = new Vector<>();
-        for (Tuple t : data ){
-          boolean f = true;
-          for(Map.Entry<Integer,Comparable> e : colNameVal.entrySet()){
-              f&= t.vector.get(e.getKey()).compareTo(e.getValue())==0;
-          }
-          if(!f) newData.add(t);
+        for (Tuple t : data) {
+            boolean f = true;
+            for (Map.Entry<Integer, Comparable> e : colNameVal.entrySet()) {
+                f &= t.vector.get(e.getKey()).compareTo(e.getValue()) == 0;
+            }
+            if (!f) newData.add(t);
         }
 
         data = newData;

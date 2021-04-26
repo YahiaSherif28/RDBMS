@@ -165,6 +165,8 @@ public class Table implements Serializable {
         Page p = pages.get(pageIndex);
         Hashtable<Integer, Comparable> colNameVal = new Hashtable<Integer, Comparable>();
         for (Map.Entry e : colNameValue.entrySet()) {
+            if (!colNameId.containsKey(e.getKey()))
+                throw new DBAppException(String.format("Update Failed. Column %s doesn't exist", e.getKey()));
             int id = colNameId.get(e.getKey());
             Comparable val = (Comparable) e.getValue();
             Comparable min = colMin.get(id);

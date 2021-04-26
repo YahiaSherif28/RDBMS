@@ -12,17 +12,17 @@ public class Table implements Serializable {
     transient private Vector<Page> pages;
     transient private Integer indexOfClusteringKey;
     transient private Vector<String> colNames;
-    transient private TreeMap<String,Integer> colNameId;
+    transient private TreeMap<String, Integer> colNameId;
     transient private Vector<String> colTypes;
     transient private Vector<Comparable> colMin;
     transient private Vector<Comparable> colMax;
 
-    public Table(String tableName, String clusteringKey, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin, Hashtable<String, String> colNameMax ) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
+    public Table(String tableName, String clusteringKey, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin, Hashtable<String, String> colNameMax) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
         this.tableName = tableName;
         pages = new Vector<>();
 
         colNames = new Vector<>();
-        for(Map.Entry<String, String> e : colNameType.entrySet()){
+        for (Map.Entry<String, String> e : colNameType.entrySet()) {
             colNames.add(e.getKey());
         }
 
@@ -32,38 +32,15 @@ public class Table implements Serializable {
         colMin = new Vector<>();
         colMax = new Vector<>();
         colNameId = new TreeMap<>();
-        int id =0;
-        for(String name : colNames){
+        int id = 0;
+        for (String name : colNames) {
             String type = colNameType.get(name);
-            if(type.equals("java.lang.String"))
+            if (type.equals("java.lang.String"))
                 type = "MyString";
             colTypes.add(type);
-            colNameId.put(name,id++);
-            String strColType = type;
-            Class myClass = Class.forName(strColType);
-            Constructor myConstructor = myClass.getConstructor(String.class);
-            Comparable myMin = null;
-            Comparable myMax = null;
-            if(strColType.equals("java.util.Date")){
-                String min = colNameMin.get(name);
-                int year = Integer.parseInt(min.trim().substring(0, 4));
-                int month = Integer.parseInt(min.trim().substring(5, 7));
-                int day = Integer.parseInt(min.trim().substring(8));
-
-                Date mindate = new Date(year - 1900, month - 1, day);
-
-                String max = colNameMax.get(name);
-                year = Integer.parseInt(max.trim().substring(0, 4));
-                month = Integer.parseInt(max.trim().substring(5, 7));
-                day = Integer.parseInt(max.trim().substring(8));
-
-                Date maxdate = new Date(year - 1900, month - 1, day);
-                myMin = mindate;
-                myMax = maxdate;
-
-            }else{
-                myMin = (Comparable) myConstructor.newInstance(colNameMin.get(name));
-                myMax = (Comparable) myConstructor.newInstance(colNameMax.get(name));}
+            colNameId.put(name, id++);
+            Comparable myMin = stringToComparable(colNameMin.get(name), type);
+            Comparable myMax = stringToComparable(colNameMax.get(name), type);
             colMin.add(myMin);
             colMax.add(myMax);
         }
@@ -109,7 +86,7 @@ public class Table implements Serializable {
     }
 
     public void add(Tuple row) throws IOException, ClassNotFoundException, DBAppException {
-        if(pages.isEmpty()) {
+        if (pages.isEmpty()) {
             Page newPage = new Page(DBApp.getNextPageName());
             newPage.getData().add(row);
             newPage.closePage();
@@ -135,11 +112,11 @@ public class Table implements Serializable {
             e.printStackTrace();
         }
         Vector<Comparable> newTupleVector = new Vector();
-        for(int i = 0; i < colNames.size(); i++) {
+        for (int i = 0; i < colNames.size(); i++) {
             String colName = colNames.get(i);
             Comparable value = (Comparable) colNameValue.get(colName);
-            if(value == null) {
-                if(i == indexOfClusteringKey)
+            if (value == null) {
+                if (i == indexOfClusteringKey)
                     throw new DBAppException("No value was inserted for the primary key.");
                 else
                     newTupleVector.add(null);
@@ -167,7 +144,7 @@ public class Table implements Serializable {
         }
     }
 
-    public void updateTuple (String clusteringKeyValue , Hashtable<String, Object> colNameValue) {
+    public void updateTuple(String clusteringKeyValue, Hashtable<String, Object> colNameValue) {
         try {
             loadTable();
         } catch (IOException e) {
@@ -175,29 +152,24 @@ public class Table implements Serializable {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        String type = colTypes.get(indexOfClusteringKey) ;
+        String type = colTypes.get(indexOfClusteringKey);
 
-        Class myClass = null;
-        Constructor myConstructor = null ;
-        Comparable key = null ;
+        Comparable key = null;
 
         try {
-            myClass = Class.forName(type);
-            myConstructor = myClass.getConstructor(String.class);
-            key = (Comparable) myConstructor.newInstance(clusteringKeyValue);
-
+            key = stringToComparable(clusteringKeyValue, type);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        int pageIndex = binarySearch(key) ;
-        Page p = pages.get(pageIndex) ;
-        Hashtable<Integer,Comparable> colNameVal = new Hashtable<Integer , Comparable>();
-        for (Map.Entry e:colNameValue.entrySet()){
+        int pageIndex = binarySearch(key);
+        Page p = pages.get(pageIndex);
+        Hashtable<Integer, Comparable> colNameVal = new Hashtable<Integer, Comparable>();
+        for (Map.Entry e : colNameValue.entrySet()) {
             int id = colNameId.get(e.getKey());
             Comparable val = (Comparable) e.getValue();
-            colNameVal.put(id,val);
+            colNameVal.put(id, val);
         }
-        p.update( key , colNameVal)  ;
+        p.update(key, colNameVal);
         try {
             closeTable();
         } catch (IOException e) {
@@ -205,7 +177,7 @@ public class Table implements Serializable {
         }
     }
 
-    public void deleteTuple (Hashtable<String, Object> columnNameValue ){
+    public void deleteTuple(Hashtable<String, Object> columnNameValue) {
         try {
             loadTable();
         } catch (IOException e) {
@@ -213,16 +185,16 @@ public class Table implements Serializable {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        Hashtable<Integer,Comparable> colNameVal = new Hashtable<Integer , Comparable>();
-        for (Map.Entry e:columnNameValue.entrySet()){
+        Hashtable<Integer, Comparable> colNameVal = new Hashtable<Integer, Comparable>();
+        for (Map.Entry e : columnNameValue.entrySet()) {
             int id = colNameId.get(e.getKey());
             Comparable val = (Comparable) e.getValue();
-            colNameVal.put(id,val);
+            colNameVal.put(id, val);
         }
         Vector<Page> newPages = new Vector<>();
-        for (Page p : pages ){
-            p.deleteTuples(colNameVal) ;
-            if(!p.isEmpty() ) {
+        for (Page p : pages) {
+            p.deleteTuples(colNameVal);
+            if (!p.isEmpty()) {
                 newPages.add(p);
             }
         }
@@ -248,6 +220,23 @@ public class Table implements Serializable {
             }
         }
         return Math.max(ans - 1, 0);
+    }
+
+    public static Date stringToDate(String s) {
+        int year = Integer.parseInt(s.trim().substring(0, 4));
+        int month = Integer.parseInt(s.trim().substring(5, 7));
+        int day = Integer.parseInt(s.trim().substring(8));
+        return new Date(year - 1900, month - 1, day);
+    }
+
+    public static Comparable stringToComparable(String object, String type) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        if (type.equals("java.util.Date")) {
+            return stringToDate(object);
+        } else {
+            Class myClass = Class.forName(type);
+            Constructor myConstructor = myClass.getConstructor(String.class);
+            return (Comparable) myConstructor.newInstance(object);
+        }
     }
 
     public String getTableName() {

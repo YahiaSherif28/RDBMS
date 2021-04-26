@@ -1,5 +1,4 @@
 import org.junit.jupiter.api.*;
-
 import java.awt.Polygon;
 import java.io.*;
 import java.nio.file.Files;
@@ -95,7 +94,6 @@ public class Milestone1Tests {
     public void testTableCreation() throws Exception {
         DBApp dbApp = new DBApp();
         dbApp.init();
-
         createStudentTable(dbApp);
         createCoursesTable(dbApp);
         createTranscriptsTable(dbApp);

@@ -15,7 +15,9 @@ public class MyString implements Comparable<MyString>, Serializable {
         if (this.length() == string.length())
             return this.s.compareTo(string.s);
         return this.length() - string.length();
+
     }
+
     public String toString() {
         return s;
     }

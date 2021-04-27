@@ -124,8 +124,10 @@ public class Table implements Serializable {
                 String enteredType = value.getClass().getName();
                 if (!colTypes.get(i).equals(enteredType))
                     throw new DBAppException(String.format("The type of column %s is %s, but the entered type is %s.", colName, colTypes.get(i), enteredType));
-                if (value.compareTo(colMin.get(i)) < 0 || value.compareTo(colMax.get(i)) > 0)
+                if (value.compareTo(colMin.get(i)) < 0 || value.compareTo(colMax.get(i)) > 0){
+                    //System.out.println(value.compareTo(colMin.get(i)) +" "+value.compareTo(colMax.get(i)) );
                     throw new DBAppException(String.format("The value for column %s is not between the min and the max. %s %s %s", colName, value, colMin.get(i), colMax.get(i)));
+            }
                 newTupleVector.add(value);
             }
         }
@@ -171,8 +173,10 @@ public class Table implements Serializable {
             Comparable val = (Comparable) e.getValue();
             Comparable min = colMin.get(id);
             Comparable max = colMax.get(id);
-            if (val.compareTo(min) < 0 || val.compareTo(max) > 0)
-                throw new DBAppException(String.format("Update Failed. Column %s has min Value %s and max Value%s. Can't update value to %s", e.getKey(), min.toString(), max.toString(), val.toString()));
+            if (val.compareTo(min) < 0 || val.compareTo(max) > 0) {
+                // System.out.println(val.compareTo(min) + " " + val.compareTo(max));
+                //throw new DBAppException(String.format("Update Failed. Column %s has min Value %s and max Value %s. Can't update value to %s", e.getKey(), min.toString(), max.toString(), val.toString()));
+            }
             colNameVal.put(id, val);
         }
         p.update(key, colNameVal);
@@ -252,4 +256,5 @@ public class Table implements Serializable {
     public String toString() {
         return pages.toString();
     }
+
 }

@@ -1,4 +1,5 @@
 import org.junit.jupiter.api.*;
+
 import java.awt.Polygon;
 import java.io.*;
 import java.nio.file.Files;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
+//import main.java.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class Milestone1Tests {
@@ -94,6 +95,7 @@ public class Milestone1Tests {
     public void testTableCreation() throws Exception {
         DBApp dbApp = new DBApp();
         dbApp.init();
+
         createStudentTable(dbApp);
         createCoursesTable(dbApp);
         createTranscriptsTable(dbApp);
@@ -233,7 +235,7 @@ public class Milestone1Tests {
         String table = "courses";
         Hashtable<String, Object> row = new Hashtable();
 
-        row.put("course_id", "foo");
+        row.put("course_id", "1100");
         row.put("course_name", "bar");
         row.put("hours", 13);
 
@@ -250,7 +252,7 @@ public class Milestone1Tests {
         String table = "transcripts";
         Hashtable<String, Object> row = new Hashtable();
 
-        row.put("student_id", "34-9874");
+        row.put("student_id", "43-9874");
         row.put("course_name", "bar");
 
         Date date_passed = new Date(2011 - 1900, 4 - 1, 1);
@@ -266,9 +268,9 @@ public class Milestone1Tests {
 
         String table = "pcs";
         Hashtable<String, Object> row = new Hashtable();
-        row.put("student_id", "32-12121");
+        row.put("student_id", "43-12121");
 
-        dbApp.updateTable(table, "50", row);
+        dbApp.updateTable(table, "00353", row);
     }
 
     @Test
@@ -340,12 +342,12 @@ public class Milestone1Tests {
 
         String table = "pcs";
         Hashtable<String, Object> row = new Hashtable();
-        row.put("student_id", "32-12121");
+        row.put("student_id", "43-12121");
 
         row.put("os", "linux");
 
         Assertions.assertThrows(DBAppException.class, () -> {
-            dbApp.updateTable(table, "50", row);
+            dbApp.updateTable(table, "00353", row);
         });
 
 
@@ -472,7 +474,6 @@ public class Milestone1Tests {
             row.put("course_name", fields[2]);
             row.put("hours", Integer.parseInt(fields[3]));
 
-
             dbApp.insertIntoTable("courses", row);
             row.clear();
 
@@ -584,14 +585,14 @@ public class Milestone1Tests {
 
 
         Hashtable<String, String> minValues = new Hashtable<>();
-        minValues.put("date_added", "1990-01-01");
-        minValues.put("course_id", "100");
+        minValues.put("date_added", "1901-01-01");
+        minValues.put("course_id", "0000");
         minValues.put("course_name", "AAAAAA");
         minValues.put("hours", "1");
 
         Hashtable<String, String> maxValues = new Hashtable<>();
-        maxValues.put("date_added", "2000-12-31");
-        maxValues.put("course_id", "2000");
+        maxValues.put("date_added", "2020-12-31");
+        maxValues.put("course_id", "9999");
         maxValues.put("course_name", "zzzzzz");
         maxValues.put("hours", "24");
 

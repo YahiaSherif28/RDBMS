@@ -161,6 +161,8 @@ public class Table implements Serializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (pages.isEmpty())
+            return;
         int pageIndex = binarySearch(key);
         Page p = pages.get(pageIndex);
         Hashtable<Integer, Comparable> colNameVal = new Hashtable<Integer, Comparable>();

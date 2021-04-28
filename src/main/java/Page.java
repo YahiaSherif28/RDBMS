@@ -63,7 +63,8 @@ public class Page implements Serializable {
         if (index < 0) {
             index = -index - 1;
         } else {
-            //throw new DBAppException("PrimaryKey already eixsts");
+            closePage();
+            throw new DBAppException("Primary Key already exists");
         }
         data.add(index, row);
         closePage();

@@ -14,6 +14,7 @@ public class Tuple implements Comparable<Tuple>, Serializable {
     public Comparable getPK() {
         return vector.get(indexOfPK);
     }
+
     public int compareTo(Tuple t) {
         return vector.get(indexOfPK).compareTo(t.vector.get(indexOfPK));
     }

@@ -194,7 +194,6 @@ public class DBApp implements DBAppInterface {
         throw new DBAppException("This table doesn't exist");
     }
 
-
     @Override
     public Iterator selectFromTable(SQLTerm[] sqlTerms, String[] arrayOperators) throws DBAppException {
         return null;

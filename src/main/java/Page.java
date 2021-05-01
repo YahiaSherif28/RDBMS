@@ -146,7 +146,6 @@ public class Page implements Serializable {
         return curSize.equals(maxSize);
     }
 
-
     public boolean isEmpty() {
         return curSize == 0;
     }

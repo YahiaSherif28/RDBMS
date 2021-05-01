@@ -3,9 +3,12 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.PrivateKey;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Table implements Serializable {
+
+    private static final String METADATA_FILE_PATH = "src/main/resources/data/metadata.csv";
     private static final String TABLES_FILE_PATH = "src/main/resources/data/tables/";
 
     private String tableName;
@@ -44,6 +47,7 @@ public class Table implements Serializable {
             colMin.add(myMin);
             colMax.add(myMax);
         }
+        writeToMetaDataFile();
         try {
             closeTable();
         } catch (IOException e) {
@@ -52,15 +56,65 @@ public class Table implements Serializable {
         //   System.out.println(tableName);
     }
 
+    public void writeToMetaDataFile() {
+        try {
+            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(METADATA_FILE_PATH, true)));
+            for(int i = 0; i < colNames.size(); i++) {
+                String minString = colMin.get(i).toString();
+                String maxString = colMax.get(i).toString();
+                if(colTypes.get(i).equals("java.util.Date")) {
+                    Date minDate = (Date)colMin.get(i);
+                    Date maxDate = (Date)colMax.get(i);
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy MM dd");
+                    minString = formatter.format(minDate);
+                    formatter = new SimpleDateFormat("yyyy MM dd");
+                    maxString = formatter.format(maxDate);
+                }
+                pw.printf("%s,%s,%s,%s,%s,%s,%s\n", tableName, colNames.get(i), colTypes.get(i), (i == indexOfClusteringKey) ? "True" : "False", "False", minString, maxString);
+            }
+            pw.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void readFromMetaDataFile() {
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(METADATA_FILE_PATH));
+            while(br.ready()) {
+                String[] column = br.readLine().split(",");
+                if(!column[0].equals(tableName))
+                    continue;
+                colNames.add(column[1]);
+                colTypes.add(column[2]);
+                colNameId.put(column[1], colNames.size() - 1);
+                colMin.add(stringToComparable(column[5], column[2]));
+                colMax.add(stringToComparable(column[6], column[2]));
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void loadTable() throws IOException, ClassNotFoundException {
         ObjectInputStream oi = new ObjectInputStream(new FileInputStream(TABLES_FILE_PATH + tableName + ".class"));
         pages = (Vector<Page>) oi.readObject();
         indexOfClusteringKey = (Integer) oi.readObject();
+
+        colNames = new Vector<>();
+        colNameId = new TreeMap<String, Integer>();
+        colTypes = new Vector<>();
+        colMin = new Vector<>();
+        colMax = new Vector<>();
+
+        readFromMetaDataFile();
+        /*
         colNames = (Vector<String>) oi.readObject();
         colNameId = (TreeMap<String, Integer>) oi.readObject();
         colTypes = (Vector<String>) oi.readObject();
         colMin = (Vector<Comparable>) oi.readObject();
         colMax = (Vector<Comparable>) oi.readObject();
+        */
         oi.close();
     }
 
@@ -68,12 +122,13 @@ public class Table implements Serializable {
         ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(TABLES_FILE_PATH + tableName + ".class"));
         os.writeObject(pages);
         os.writeObject(indexOfClusteringKey);
+        /*
         os.writeObject(colNames);
         os.writeObject(colNameId);
         os.writeObject(colTypes);
         os.writeObject(colMin);
         os.writeObject(colMax);
-
+        */
         pages = null;
         indexOfClusteringKey = null;
         colNames = null;

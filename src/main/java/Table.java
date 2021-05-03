@@ -8,10 +8,10 @@ import java.util.*;
 
 public class Table implements Serializable {
 
-    private static final String METADATA_FILE_PATH = "src/main/resources/data/metadata.csv";
+    private static final String METADATA_FILE_PATH = "src/main/resources/metadata.csv";
     private static final String TABLES_FILE_PATH = "src/main/resources/data/tables/";
 
-    private String tableName;
+    private final String tableName;
     transient private Vector<Page> pages;
     transient private Integer indexOfClusteringKey;
     transient private Vector<String> colNames;
@@ -53,7 +53,6 @@ public class Table implements Serializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //   System.out.println(tableName);
     }
 
     public void writeToMetaDataFile() {
@@ -161,9 +160,7 @@ public class Table implements Serializable {
     public void insertTuple(Hashtable<String, Object> colNameValue) throws DBAppException {
         try {
             loadTable();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         Vector<Comparable> newTupleVector = new Vector();
@@ -189,9 +186,7 @@ public class Table implements Serializable {
 
         try {
             add(new Tuple(newTupleVector, indexOfClusteringKey));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         try {
@@ -204,9 +199,7 @@ public class Table implements Serializable {
     public void updateTuple(String clusteringKeyValue, Hashtable<String, Object> colNameValue) throws DBAppException {
         try {
             loadTable();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         String type = colTypes.get(indexOfClusteringKey);
@@ -247,9 +240,7 @@ public class Table implements Serializable {
     public void deleteTuple(Hashtable<String, Object> columnNameValue) {
         try {
             loadTable();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         Hashtable<Integer, Comparable> colNameVal = new Hashtable<Integer, Comparable>();

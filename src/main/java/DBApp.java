@@ -12,34 +12,6 @@ public class DBApp implements DBAppInterface {
 
     private Vector<Table> tables;
 
-    public static void main(String[] args) throws Exception {
-//        DBApp dbapp = new DBApp();
-//        String strTableName = "Student";
-//        Hashtable htblColNameType = new Hashtable( );
-//        htblColNameType.put("id", "java.lang.Integer");
-//        htblColNameType.put("name", "java.lang.String");
-//        htblColNameType.put("gpa", "java.lang.Double");
-//        Hashtable htblColNameMin = new Hashtable( );
-//        htblColNameMin.put("id", "1000");
-//        htblColNameMin.put("name", "A");
-//        htblColNameMin.put("gpa", "0.7");
-//        Hashtable htblColNameMax = new Hashtable( );
-//        htblColNameMax.put("id", "2000");
-//        htblColNameMax.put("name", "Z");
-//        htblColNameMax.put("gpa", "2");
-//        dbapp.createTable( strTableName, "id", htblColNameType ,htblColNameMin,htblColNameMax);
-//
-//        Hashtable htblColNameValue = new Hashtable( );
-//        htblColNameValue.put("id", new Integer( 1000 ));
-//        htblColNameValue.put("name", new String("A" ) );
-//        htblColNameValue.put("gpa", new Double( 0.95 ) );
-//        dbapp.insertIntoTable( strTableName , htblColNameValue );
-//
-//        System.out.println(dbapp.tables.get(0).toString());
-
-        DBApp dbapp = new DBApp();
-    }
-
     public DBApp() {
         init();
     }

@@ -153,18 +153,20 @@ public class Page implements Serializable {
     public String toString() {
         try {
             loadPage();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-        String s = fileName + "\n" + data.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append(fileName + " " + "\n");
+        for (Tuple t : data) {
+            sb.append(t.toString() + "\n");
+        }
         try {
             closePage();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return s;
+        return sb.toString();
     }
 
 }

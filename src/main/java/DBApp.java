@@ -53,12 +53,12 @@ public class DBApp implements DBAppInterface {
     @Override
     public void init() {
 
-        try{
+        try {
             Properties p = new Properties();
             p.load(new FileReader(RESOURCES_PATH + CONFIG_FILE));
             MaximumRowsCountinTablePage = Integer.parseInt(p.getProperty(new String("MaximumRowsCountinPage")));
             MaximumKeysCountinIndexBucket = Integer.parseInt(p.getProperty(new String("MaximumKeysCountinIndexBucket")));
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getStackTrace());
         }
 
@@ -88,14 +88,13 @@ public class DBApp implements DBAppInterface {
 
     @Override
     public void createTable(String tableName, String clusteringKey, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin, Hashtable<String, String> colNameMax) throws DBAppException {
-        check(tableName,clusteringKey,colNameType,colNameMin,colNameMax);
+        check(tableName, clusteringKey, colNameType, colNameMin, colNameMax);
         try {
 
-            tables.add(new Table(tableName,clusteringKey,colNameType,colNameMin,colNameMax));
+            tables.add(new Table(tableName, clusteringKey, colNameType, colNameMin, colNameMax));
 //            System.out.println(tableName+" "+clusteringKey+" "+colNameType+" "+colNameMin+" "+colNameMax);
 //            System.out.println(tables);
-            }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -103,26 +102,27 @@ public class DBApp implements DBAppInterface {
     }
 
     public static void changeStringToMyString(Hashtable<String, Object> in) {
-        for(Map.Entry<String, Object> e : in.entrySet())
-            if(e.getValue() instanceof String)
-                e.setValue(new MyString((String)e.getValue()));
+        for (Map.Entry<String, Object> e : in.entrySet())
+            if (e.getValue() instanceof String)
+                e.setValue(new MyString((String) e.getValue()));
     }
 
     private void check(String tableName, String clusteringKey, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin, Hashtable<String, String> colNameMax) throws DBAppException {
-        for (Table table : tables){
-            if(table.getTableName().equals(tableName)) throw new DBAppException( tableName +" already exists") ;
+        for (Table table : tables) {
+            if (table.getTableName().equals(tableName)) throw new DBAppException(tableName + " already exists");
         }
-        if(!colNameType.containsKey(clusteringKey))  throw new DBAppException( "Invalid clusteringKey");
-        if((!colNameType.keySet().equals(colNameMin.keySet()))||(!colNameMin.keySet().equals(colNameMax.keySet()))||(!colNameType.keySet().equals(colNameMax.keySet())) ) throw new DBAppException("Each Column must have corresponding type, min and max");
+        if (!colNameType.containsKey(clusteringKey)) throw new DBAppException("Invalid clusteringKey");
+        if ((!colNameType.keySet().equals(colNameMin.keySet())) || (!colNameMin.keySet().equals(colNameMax.keySet())) || (!colNameType.keySet().equals(colNameMax.keySet())))
+            throw new DBAppException("Each Column must have corresponding type, min and max");
 
-        for(Map.Entry<String,String> e : colNameType.entrySet()){
-            String strColType =e.getValue();
+        for (Map.Entry<String, String> e : colNameType.entrySet()) {
+            String strColType = e.getValue();
             boolean f = false;
             f |= strColType.equals("java.lang.Integer");
             f |= strColType.equals("java.lang.String");
             f |= strColType.equals("java.lang.Double");
             f |= strColType.equals("java.util.Date");
-            if(!f) throw new DBAppException("Type is not valid");
+            if (!f) throw new DBAppException("Type is not valid");
 
         }
 
@@ -145,11 +145,11 @@ public class DBApp implements DBAppInterface {
     }
 
     @Override
-    public void updateTable(String tableName, String clusteringKeyValue, Hashtable<String , Object> columnNameValue) throws DBAppException {
+    public void updateTable(String tableName, String clusteringKeyValue, Hashtable<String, Object> columnNameValue) throws DBAppException {
         changeStringToMyString(columnNameValue);
         for (Table table : tables)
-            if(table.getTableName().equals(tableName)) {
-                    table.updateTuple(clusteringKeyValue,columnNameValue);
+            if (table.getTableName().equals(tableName)) {
+                table.updateTuple(clusteringKeyValue, columnNameValue);
                 return;
             }
         throw new DBAppException("This table doesn't exist");
@@ -159,7 +159,7 @@ public class DBApp implements DBAppInterface {
     public void deleteFromTable(String tableName, Hashtable<String, Object> columnNameValue) throws DBAppException {
         changeStringToMyString(columnNameValue);
         for (Table table : tables)
-            if(table.getTableName().equals(tableName)) {
+            if (table.getTableName().equals(tableName)) {
                 table.deleteTuple(columnNameValue);
                 return;
             }
@@ -170,4 +170,15 @@ public class DBApp implements DBAppInterface {
     public Iterator selectFromTable(SQLTerm[] sqlTerms, String[] arrayOperators) throws DBAppException {
         return null;
     }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < tables.size(); i++) {
+            sb.append("Table " + i);
+            sb.append(tables.get(i).toString());
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
 }

@@ -58,12 +58,12 @@ public class Table implements Serializable {
     public void writeToMetaDataFile() {
         try {
             PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(METADATA_FILE_PATH, true)));
-            for(int i = 0; i < colNames.size(); i++) {
+            for (int i = 0; i < colNames.size(); i++) {
                 String minString = colMin.get(i).toString();
                 String maxString = colMax.get(i).toString();
-                if(colTypes.get(i).equals("java.util.Date")) {
-                    Date minDate = (Date)colMin.get(i);
-                    Date maxDate = (Date)colMax.get(i);
+                if (colTypes.get(i).equals("java.util.Date")) {
+                    Date minDate = (Date) colMin.get(i);
+                    Date maxDate = (Date) colMax.get(i);
                     SimpleDateFormat formatter = new SimpleDateFormat("yyyy MM dd");
                     minString = formatter.format(minDate);
                     formatter = new SimpleDateFormat("yyyy MM dd");
@@ -80,9 +80,9 @@ public class Table implements Serializable {
     public void readFromMetaDataFile() {
         try {
             BufferedReader br = new BufferedReader(new FileReader(METADATA_FILE_PATH));
-            while(br.ready()) {
+            while (br.ready()) {
                 String[] column = br.readLine().split(",");
-                if(!column[0].equals(tableName))
+                if (!column[0].equals(tableName))
                     continue;
                 colNames.add(column[1]);
                 colTypes.add(column[2]);
@@ -90,7 +90,7 @@ public class Table implements Serializable {
                 colMin.add(stringToComparable(column[5], column[2]));
                 colMax.add(stringToComparable(column[6], column[2]));
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -176,10 +176,10 @@ public class Table implements Serializable {
                 String enteredType = value.getClass().getName();
                 if (!colTypes.get(i).equals(enteredType))
                     throw new DBAppException(String.format("The type of column %s is %s, but the entered type is %s.", colName, colTypes.get(i), enteredType));
-                if (value.compareTo(colMin.get(i)) < 0 || value.compareTo(colMax.get(i)) > 0){
+                if (value.compareTo(colMin.get(i)) < 0 || value.compareTo(colMax.get(i)) > 0) {
                     //System.out.println(value.compareTo(colMin.get(i)) +" "+value.compareTo(colMax.get(i)) );
                     throw new DBAppException(String.format("The value for column %s is not between the min and the max. %s %s %s", colName, value, colMin.get(i), colMax.get(i)));
-            }
+                }
                 newTupleVector.add(value);
             }
         }
@@ -302,7 +302,24 @@ public class Table implements Serializable {
     }
 
     public String toString() {
-        return pages.toString();
+        try {
+            loadTable();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(tableName + "\n");
+        for (int i = 0; i < pages.size(); i++) {
+            sb.append("Page " + i);
+            sb.append(pages.get(i).toString());
+            sb.append("\n");
+        }
+        try {
+            closeTable();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
     }
 
 }

@@ -7,7 +7,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Table implements Serializable {
-
     private static final String METADATA_FILE_PATH = "src/main/resources/metadata.csv";
     private static final String TABLES_FILE_PATH = "src/main/resources/data/tables/";
 
@@ -47,6 +46,7 @@ public class Table implements Serializable {
             colMin.add(myMin);
             colMax.add(myMax);
         }
+
         writeToMetaDataFile();
         try {
             closeTable();
@@ -75,9 +75,21 @@ public class Table implements Serializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        colNames = null;
+        colNameId = null;
+        colTypes = null;
+        colMin = null;
+        colMax = null;
     }
 
     public void readFromMetaDataFile() {
+        colNames = new Vector<>();
+        colNameId = new TreeMap<String, Integer>();
+        colTypes = new Vector<>();
+        colMin = new Vector<>();
+        colMax = new Vector<>();
+
         try {
             BufferedReader br = new BufferedReader(new FileReader(METADATA_FILE_PATH));
             while (br.ready()) {
@@ -99,12 +111,6 @@ public class Table implements Serializable {
         ObjectInputStream oi = new ObjectInputStream(new FileInputStream(TABLES_FILE_PATH + tableName + ".class"));
         pages = (Vector<Page>) oi.readObject();
         indexOfClusteringKey = (Integer) oi.readObject();
-
-        colNames = new Vector<>();
-        colNameId = new TreeMap<String, Integer>();
-        colTypes = new Vector<>();
-        colMin = new Vector<>();
-        colMax = new Vector<>();
 
         readFromMetaDataFile();
         /*
@@ -130,13 +136,28 @@ public class Table implements Serializable {
         */
         pages = null;
         indexOfClusteringKey = null;
-        colNames = null;
-        colNameId = null;
-        colTypes = null;
-        colMin = null;
-        colMax = null;
 
         os.close();
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    private int binarySearch(Comparable key) {
+        int lo = 0;
+        int hi = pages.size() - 1;
+        int ans = pages.size();
+        while (lo <= hi) {
+            int mid = (lo + hi) / 2;
+            if (pages.get(mid).getMinPK().compareTo(key) > 0) {
+                ans = mid;
+                hi = mid - 1;
+            } else {
+                lo = mid + 1;
+            }
+        }
+        return Math.max(ans - 1, 0);
     }
 
     public void add(Tuple row) throws IOException, ClassNotFoundException, DBAppException {
@@ -264,22 +285,6 @@ public class Table implements Serializable {
         }
     }
 
-    private int binarySearch(Comparable key) {
-        int lo = 0;
-        int hi = pages.size() - 1;
-        int ans = pages.size();
-        while (lo <= hi) {
-            int mid = (lo + hi) / 2;
-            if (pages.get(mid).getMinPK().compareTo(key) > 0) {
-                ans = mid;
-                hi = mid - 1;
-            } else {
-                lo = mid + 1;
-            }
-        }
-        return Math.max(ans - 1, 0);
-    }
-
     public static Date stringToDate(String s) {
         int year = Integer.parseInt(s.trim().substring(0, 4));
         int month = Integer.parseInt(s.trim().substring(5, 7));
@@ -295,10 +300,6 @@ public class Table implements Serializable {
             Constructor myConstructor = myClass.getConstructor(String.class);
             return (Comparable) myConstructor.newInstance(object);
         }
-    }
-
-    public String getTableName() {
-        return tableName;
     }
 
     public String toString() {

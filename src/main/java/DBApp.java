@@ -3,10 +3,11 @@ import java.util.*;
 
 public class DBApp implements DBAppInterface {
     private static final String NEXT_PAGE_NAME_PATH = "src/main/resources/data/nextPageName.class";
+    private static final String TABLES_FILE_PATH = "src/main/resources/data/tables.class";
     private static final String PAGES_FILE_PATH = "src/main/resources/data/pages/";
     private static final String RESOURCES_PATH = "src/main/resources/";
-    private static final String TABLES_FILE_PATH = "src/main/resources/data/tables.class";
     private static final String CONFIG_FILE = "DBApp.config";
+
     private static Integer MaximumRowsCountinTablePage;
     private static Integer MaximumKeysCountinIndexBucket;
 
@@ -62,7 +63,6 @@ public class DBApp implements DBAppInterface {
             System.out.println(e.getStackTrace());
         }
 
-
         try {
             ObjectInputStream oi = new ObjectInputStream(new FileInputStream(TABLES_FILE_PATH));
             tables = (Vector<Table>) oi.readObject();
@@ -70,6 +70,7 @@ public class DBApp implements DBAppInterface {
         } catch (Exception e) {
             tables = new Vector<>();
         }
+
         try {
             ObjectInputStream oi = new ObjectInputStream(new FileInputStream(NEXT_PAGE_NAME_PATH));
             oi.readInt();
@@ -80,31 +81,10 @@ public class DBApp implements DBAppInterface {
                 os.writeInt(0);
                 os.close();
             } catch (Exception e1) {
-
+                System.out.println(e1.getStackTrace());
             }
         }
 
-    }
-
-    @Override
-    public void createTable(String tableName, String clusteringKey, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin, Hashtable<String, String> colNameMax) throws DBAppException {
-        check(tableName, clusteringKey, colNameType, colNameMin, colNameMax);
-        try {
-
-            tables.add(new Table(tableName, clusteringKey, colNameType, colNameMin, colNameMax));
-//            System.out.println(tableName+" "+clusteringKey+" "+colNameType+" "+colNameMin+" "+colNameMax);
-//            System.out.println(tables);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        reserialize();
-    }
-
-    public static void changeStringToMyString(Hashtable<String, Object> in) {
-        for (Map.Entry<String, Object> e : in.entrySet())
-            if (e.getValue() instanceof String)
-                e.setValue(new MyString((String) e.getValue()));
     }
 
     private void check(String tableName, String clusteringKey, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin, Hashtable<String, String> colNameMax) throws DBAppException {
@@ -129,8 +109,28 @@ public class DBApp implements DBAppInterface {
     }
 
     @Override
+    public void createTable(String tableName, String clusteringKey, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin, Hashtable<String, String> colNameMax) throws DBAppException {
+        check(tableName, clusteringKey, colNameType, colNameMin, colNameMax);
+        try {
+            tables.add(new Table(tableName, clusteringKey, colNameType, colNameMin, colNameMax));
+//            System.out.println(tableName+" "+clusteringKey+" "+colNameType+" "+colNameMin+" "+colNameMax);
+//            System.out.println(tables);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        reserialize();
+    }
+
+    @Override
     public void createIndex(String tableName, String[] columnNames) throws DBAppException {
 
+    }
+
+    public static void changeStringToMyString(Hashtable<String, Object> in) {
+        for (Map.Entry<String, Object> e : in.entrySet())
+            if (e.getValue() instanceof String)
+                e.setValue(new MyString((String) e.getValue()));
     }
 
     @Override

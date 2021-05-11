@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.Vector;
 
 public class GridIndex implements Serializable {
@@ -27,7 +28,7 @@ public class GridIndex implements Serializable {
         }
     }
 
-    public Vector<Integer> getRangeIndicesFromValues(Vector<Comparable> values) {
+    private Vector<Integer> getRangeIndicesFromValues(Vector<Comparable> values) {
         Vector<Integer> rangeIndices = new Vector<>();
         for(int i = 0; i < dimension; i++) {
             Comparable colVal = values.get(i);
@@ -49,16 +50,16 @@ public class GridIndex implements Serializable {
         insertInGridRec(grid, rangeIndices, 1, dimension, pageName);
     }
 
-    private void insertInGridRec(Object grid, Vector<Integer> values, int curDimension, int maxDimension, String pageName) {
+    private void insertInGridRec(Object grid, Vector<Integer> rangeIndices, int curDimension, int maxDimension, String pageName) {
         Object[] array = (Object[]) grid;
-        Object nextObject = array[values.get(curDimension - 1)];
+        Object nextObject = array[rangeIndices.get(curDimension - 1)];
         if(curDimension == maxDimension) {
             if(nextObject == null)
-                nextObject = array[values.get(curDimension - 1)] = new Bucket();
+                nextObject = array[rangeIndices.get(curDimension - 1)] = new Bucket();
             ((Bucket)nextObject).add(pageName);
             return;
         }
-        insertInGridRec(nextObject, values, curDimension + 1, maxDimension, pageName);
+        insertInGridRec(nextObject, rangeIndices, curDimension + 1, maxDimension, pageName);
     }
 
     public void deleteTuple(Vector<Comparable> values, String pageName) {
@@ -66,16 +67,16 @@ public class GridIndex implements Serializable {
         deleteFromGridRec(grid, indices, 1, dimension, pageName);
     }
 
-    private void deleteFromGridRec(Object grid, Vector<Integer> values, int curDimension, int maxDimension, String pageName) {
+    private void deleteFromGridRec(Object grid, Vector<Integer> rangeIndices, int curDimension, int maxDimension, String pageName) {
         Object[] array = (Object[]) grid;
-        Object nextObject = array[values.get(curDimension - 1)];
+        Object nextObject = array[rangeIndices.get(curDimension - 1)];
         if(curDimension == maxDimension) {
             if(nextObject == null)
-                nextObject = array[values.get(curDimension - 1)] = new Bucket();
+                nextObject = array[rangeIndices.get(curDimension - 1)] = new Bucket();
             ((Bucket)nextObject).delete(pageName);
             return;
         }
-        deleteFromGridRec(nextObject, values, curDimension + 1, maxDimension, pageName);
+        deleteFromGridRec(nextObject, rangeIndices, curDimension + 1, maxDimension, pageName);
     }
 
     public boolean equals(String[] columns) {

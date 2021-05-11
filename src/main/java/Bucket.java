@@ -21,13 +21,13 @@ public class Bucket implements Serializable {
         }
     }
 
-    public void loadBucket() throws IOException, ClassNotFoundException {
+    private void loadBucket() throws IOException, ClassNotFoundException {
         ObjectInputStream oi = new ObjectInputStream(new FileInputStream(bucketName));
         pages = (Vector<String>) oi.readObject();
         oi.close();
     }
 
-    public void closeBucket() throws IOException {
+    private void closeBucket() throws IOException {
         ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(bucketName));
         curSize = pages.size();
         os.writeObject(pages);

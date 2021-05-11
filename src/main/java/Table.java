@@ -11,8 +11,8 @@ public class Table implements Serializable {
     private static final String TABLES_FILE_PATH = "src/main/resources/data/tables/";
 
     private final String tableName;
-    transient private Vector<GridIndex> indices;
     transient private Vector<Page> pages;
+    transient private Vector<GridIndex> indices;
     transient private Integer indexOfClusteringKey;
     transient private Vector<String> colNames;
     transient private TreeMap<String, Integer> colNameId;
@@ -111,6 +111,7 @@ public class Table implements Serializable {
     public void loadTable() throws IOException, ClassNotFoundException {
         ObjectInputStream oi = new ObjectInputStream(new FileInputStream(TABLES_FILE_PATH + tableName + ".ser"));
         pages = (Vector<Page>) oi.readObject();
+        indices = (Vector<GridIndex>) oi.readObject();
         indexOfClusteringKey = (Integer) oi.readObject();
 
         readFromMetaDataFile();
@@ -127,6 +128,7 @@ public class Table implements Serializable {
     public void closeTable() throws IOException {
         ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(TABLES_FILE_PATH + tableName + ".ser"));
         os.writeObject(pages);
+        os.writeObject(indices);
         os.writeObject(indexOfClusteringKey);
         /*
         os.writeObject(colNames);
@@ -136,6 +138,7 @@ public class Table implements Serializable {
         os.writeObject(colMax);
         */
         pages = null;
+        indices = null;
         indexOfClusteringKey = null;
 
         os.close();
@@ -180,7 +183,7 @@ public class Table implements Serializable {
             colIds[i] = colNameId.get(columnNames);
 
         for(Page page : pages) {
-            Vector<Tuple> rows = page.getData();
+            Vector<Tuple> rows = page.loadAndGetData();
             for(Tuple row : rows) {
                 Vector<Comparable> rowData = row.getTupleData();
                 Vector<Comparable> values = new Vector<>();

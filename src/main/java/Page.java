@@ -18,6 +18,19 @@ public class Page implements Serializable {
         curSize = 0;
     }
 
+    public Vector<Tuple> loadAndGetData() {
+        Vector<Tuple> temp = null;
+        try {
+            loadPage();
+            temp = data;
+            closePage();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return temp;
+    }
+
     public Vector<Tuple> getData() {
         return data;
     }

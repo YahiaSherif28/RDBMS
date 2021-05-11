@@ -3,8 +3,8 @@ import java.io.Serializable;
 import java.util.Vector;
 
 public class Tuple implements Comparable<Tuple>, Serializable {
-    int indexOfPK;
-    Vector<Comparable> vector;
+    private int indexOfPK;
+    private Vector<Comparable> vector;
 
     public Tuple(Vector<Comparable> vector, int indexOfPK) {
         this.vector = vector;
@@ -13,6 +13,10 @@ public class Tuple implements Comparable<Tuple>, Serializable {
 
     public Comparable getPK() {
         return vector.get(indexOfPK);
+    }
+
+    public Vector<Comparable> getTupleData() {
+        return vector;
     }
 
     public int compareTo(Tuple t) {

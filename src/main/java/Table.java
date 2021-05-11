@@ -11,6 +11,7 @@ public class Table implements Serializable {
     private static final String TABLES_FILE_PATH = "src/main/resources/data/tables/";
 
     private final String tableName;
+    transient private Vector<GridIndex> indices;
     transient private Vector<Page> pages;
     transient private Integer indexOfClusteringKey;
     transient private Vector<String> colNames;
@@ -108,7 +109,7 @@ public class Table implements Serializable {
     }
 
     public void loadTable() throws IOException, ClassNotFoundException {
-        ObjectInputStream oi = new ObjectInputStream(new FileInputStream(TABLES_FILE_PATH + tableName + ".class"));
+        ObjectInputStream oi = new ObjectInputStream(new FileInputStream(TABLES_FILE_PATH + tableName + ".ser"));
         pages = (Vector<Page>) oi.readObject();
         indexOfClusteringKey = (Integer) oi.readObject();
 
@@ -124,7 +125,7 @@ public class Table implements Serializable {
     }
 
     public void closeTable() throws IOException {
-        ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(TABLES_FILE_PATH + tableName + ".class"));
+        ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(TABLES_FILE_PATH + tableName + ".ser"));
         os.writeObject(pages);
         os.writeObject(indexOfClusteringKey);
         /*
@@ -142,6 +143,58 @@ public class Table implements Serializable {
 
     public String getTableName() {
         return tableName;
+    }
+
+    public void createIndex(String[] columnNames) throws DBAppException {
+        try {
+            loadTable();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // check if column names exist
+        boolean columnsExist = true;
+        for(String column : columnNames) {
+            if (!colNameId.containsKey(column))
+                throw new DBAppException(String.format("Column %s doesn't exist in the table %s.", column, tableName));
+        }
+
+        // check if index is repeated
+        Arrays.sort(columnNames);
+        for(GridIndex index : indices) {
+            if (index.equals(columnNames))
+                throw new DBAppException("Index already Exists");
+        }
+
+        // generate range values for all columns
+        Comparable[][] minRange = null;
+        Comparable[][] maxRange = null;
+
+        // create index and add to indices vector
+        GridIndex newIndex = new GridIndex(columnNames, minRange, maxRange);
+        indices.add(newIndex);
+
+        // populate index
+        int[] colIds = new int[columnNames.length];
+        for(int i = 0; i < columnNames.length; i++)
+            colIds[i] = colNameId.get(columnNames);
+
+        for(Page page : pages) {
+            Vector<Tuple> rows = page.getData();
+            for(Tuple row : rows) {
+                Vector<Comparable> rowData = row.getTupleData();
+                Vector<Comparable> values = new Vector<>();
+                for(int i = 0; i < columnNames.length; i++)
+                    values.add(rowData.get(colIds[i]));
+                newIndex.insertTuple(values, page.getFileName());
+            }
+        }
+
+        try {
+            closeTable();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private int binarySearch(Comparable key) {

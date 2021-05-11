@@ -2,9 +2,11 @@ import java.io.*;
 import java.util.*;
 
 public class DBApp implements DBAppInterface {
-    private static final String NEXT_PAGE_NAME_PATH = "src/main/resources/data/nextPageName.class";
-    private static final String TABLES_FILE_PATH = "src/main/resources/data/tables.class";
+    private static final String NEXT_PAGE_NAME_PATH = "src/main/resources/data/nextPageName.ser";
+    private static final String NEXT_BUCKET_NAME_PATH = "src/main/resources/data/nextBucketName.ser";
+    private static final String TABLES_FILE_PATH = "src/main/resources/data/tables.ser";
     private static final String PAGES_FILE_PATH = "src/main/resources/data/pages/";
+    private static final String BUCKETS_FILE_PATH = "src/main/resources/data/buckets/";
     private static final String RESOURCES_PATH = "src/main/resources/";
     private static final String CONFIG_FILE = "DBApp.config";
 
@@ -37,7 +39,22 @@ public class DBApp implements DBAppInterface {
     }
 
     public static String getNextPageName() throws IOException {
-        return PAGES_FILE_PATH + String.valueOf(getNextPageNameAsInt()) + ".class";
+        return PAGES_FILE_PATH + String.valueOf(getNextPageNameAsInt()) + ".ser";
+    }
+
+    private static int getNextBucketNameAsInt() throws IOException {
+        ObjectInputStream oi = new ObjectInputStream(new FileInputStream(NEXT_BUCKET_NAME_PATH));
+        Integer nextBucketName = oi.readInt();
+        nextBucketName++;
+        oi.close();
+        ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(NEXT_BUCKET_NAME_PATH));
+        os.writeInt(nextBucketName);
+        os.close();
+        return nextBucketName;
+    }
+
+    public static String getNextBucketName() throws IOException {
+        return BUCKETS_FILE_PATH + String.valueOf(getNextBucketNameAsInt()) + ".ser";
     }
 
     public void reserialize() {
@@ -85,6 +102,20 @@ public class DBApp implements DBAppInterface {
             }
         }
 
+        try {
+            ObjectInputStream oi = new ObjectInputStream(new FileInputStream(NEXT_BUCKET_NAME_PATH));
+            oi.readInt();
+            oi.close();
+        } catch (Exception e) {
+            try {
+                ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(NEXT_BUCKET_NAME_PATH));
+                os.writeInt(0);
+                os.close();
+            } catch (Exception e1) {
+                System.out.println(e1.getStackTrace());
+            }
+        }
+
     }
 
     private void check(String tableName, String clusteringKey, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin, Hashtable<String, String> colNameMax) throws DBAppException {
@@ -124,7 +155,12 @@ public class DBApp implements DBAppInterface {
 
     @Override
     public void createIndex(String tableName, String[] columnNames) throws DBAppException {
-
+        for (Table table : tables)
+            if (table.getTableName().equals(tableName)) {
+                table.createIndex(columnNames);
+                return;
+            }
+        throw new DBAppException("This table doesn't exist");
     }
 
     public static void changeStringToMyString(Hashtable<String, Object> in) {

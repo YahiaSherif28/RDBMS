@@ -18,6 +18,19 @@ public class Page implements Serializable {
         curSize = 0;
     }
 
+    public Vector<Tuple> loadAndGetData() {
+        Vector<Tuple> temp = null;
+        try {
+            loadPage();
+            temp = data;
+            closePage();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return temp;
+    }
+
     public Vector<Tuple> getData() {
         return data;
     }
@@ -108,7 +121,7 @@ public class Page implements Serializable {
         if (id == -1) return;
 
         for (Map.Entry<Integer, Comparable> e : colNameVal.entrySet()) {
-            data.get(id).vector.set(e.getKey(), e.getValue());
+            data.get(id).getTupleData().set(e.getKey(), e.getValue());
         }
 
 
@@ -129,7 +142,7 @@ public class Page implements Serializable {
         for (Tuple t : data) {
             boolean f = true;
             for (Map.Entry<Integer, Comparable> e : colNameVal.entrySet()) {
-                f &= t.vector.get(e.getKey()).compareTo(e.getValue()) == 0;
+                f &= t.getTupleData().get(e.getKey()).compareTo(e.getValue()) == 0;
             }
             if (!f) newData.add(t);
         }

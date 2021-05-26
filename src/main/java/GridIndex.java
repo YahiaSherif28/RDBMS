@@ -1,5 +1,6 @@
 import java.io.Serializable;
 import java.lang.reflect.Array;
+import java.util.Hashtable;
 import java.util.Vector;
 
 public class GridIndex implements Serializable {
@@ -87,4 +88,16 @@ public class GridIndex implements Serializable {
                 return false;
         return true;
     }
+
+    // returns the names of pages to be opened
+    // Use hashtable just as a hashset. HashSet is not thread-safe.
+    // take a look at the Range class
+    // ranges are in the same order as the columns in the index
+    public Hashtable<String,Integer> select (Range[] ranges) throws DBAppException {
+        if(ranges.length != dimension) {
+            throw new DBAppException();
+        }
+        return null;
+    }
+
 }

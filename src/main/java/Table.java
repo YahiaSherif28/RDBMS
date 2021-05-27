@@ -379,9 +379,15 @@ public class Table implements Serializable {
         return sb.toString();
     }
 
-    private static final String AND = "AND", OR = "OR", XOR = "XOR";
+    public static final String AND = "AND", OR = "OR", XOR = "XOR";
 
-    public Iterator select(SQLTerm[] sqlTerms, String[] arrayOperators) throws DBAppException {
+    public Iterator select(SQLTerm[] sqlTerms, String[] arrayOperators) throws DBAppException, IOException, ClassNotFoundException {
+        loadTable();
+        for (SQLTerm s : sqlTerms) {
+            if (!colNames.contains(s._strColumnName)) {
+                throw new DBAppException("Table doesn't contain this column");
+            }
+        }
         Vector<SQLTerm> segment = new Vector();
         HashSet<String> pagesToOpen = new HashSet<>();
         for (int i = 0; i < sqlTerms.length; i++) {
@@ -391,6 +397,14 @@ public class Table implements Serializable {
                 segment = new Vector<>();
             }
         }
+        Vector<Tuple> result = new Vector<>();
+        for (Page p : pages) {
+            if (pagesToOpen.contains(p.getFileName())) {
+                result.addAll(p.select(sqlTerms, arrayOperators));
+            }
+        }
+        closeTable();
+        return result.iterator();
     }
 
     public HashSet<String> selectSegment(Vector<SQLTerm> segment) throws DBAppException {
@@ -414,9 +428,18 @@ public class Table implements Serializable {
     }
 
 
-
-    private HashSet<String> selectWithoutIndex(Hashtable<String,Range> range) {
-
+    private HashSet<String> selectWithoutIndex(Hashtable<String, Range> range) {
+        HashSet<String> pagesToOpen = new HashSet<>();
+        String clusteringKey = colNames.get(indexOfClusteringKey);
+        Range myRange = range.getOrDefault(clusteringKey, new Range(colMin.get(indexOfClusteringKey), colMax.get(indexOfClusteringKey)));
+        for (Page p : pages) {
+            if (p.getMinPK().compareTo(myRange.min) >= 0) {
+                pagesToOpen.add(p.getFileName());
+            } else if (p.getMinPK().compareTo(myRange.max) > 0) {
+                break;
+            }
+        }
+        return pagesToOpen;
     }
 
     private GridIndex pickBestIndex(Hashtable<String, Range> range) throws DBAppException {

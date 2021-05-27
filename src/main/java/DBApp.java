@@ -204,7 +204,34 @@ public class DBApp implements DBAppInterface {
 
     @Override
     public Iterator selectFromTable(SQLTerm[] sqlTerms, String[] arrayOperators) throws DBAppException {
-        return null;
+        if (sqlTerms.length == 0) {
+            throw new DBAppException("Invalid expression");
+        }
+        if (arrayOperators.length != sqlTerms.length - 1) {
+            throw new DBAppException("Invalid expression");
+        }
+        for (int i = 0; i < sqlTerms.length - 1; i++) {
+            if (!sqlTerms[i]._strTableName.equals(sqlTerms[i + 1]._strTableName)) {
+                throw new DBAppException("Columns from different tables are not valid");
+            }
+        }
+        for (int i = 0; i < arrayOperators.length; i++) {
+            if (!arrayOperators[i].equals(Table.AND) && !arrayOperators[i].equals(Table.OR) && !arrayOperators[i].equals(Table.XOR)) {
+                throw new DBAppException("Invalid operator");
+            }
+        }
+        String tableName = sqlTerms[0]._strTableName;
+        try {
+            for (Table t : tables) {
+                if (t.getTableName().equals(tableName)) {
+                    return t.select(sqlTerms, arrayOperators);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new DBAppException("Something went wrong while selecting");
+        }
+        throw new DBAppException("Table not found");
     }
 
     public String toString() {

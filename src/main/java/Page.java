@@ -1,8 +1,5 @@
 import java.io.*;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 public class Page implements Serializable {
     private transient Vector<Tuple> data;
@@ -182,4 +179,6 @@ public class Page implements Serializable {
         return sb.toString();
     }
 
+    public Vector<Tuple> select(SQLTerm[] sqlTerms, String[] arrayOperators) {
+    }
 }

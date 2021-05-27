@@ -157,14 +157,14 @@ public class Table implements Serializable {
 
         // check if column names exist
         boolean columnsExist = true;
-        for(String column : columnNames) {
+        for (String column : columnNames) {
             if (!colNameId.containsKey(column))
                 throw new DBAppException(String.format("Column %s doesn't exist in the table %s.", column, tableName));
         }
 
         // check if index is repeated
         Arrays.sort(columnNames);
-        for(GridIndex index : indices) {
+        for (GridIndex index : indices) {
             if (index.equals(columnNames))
                 throw new DBAppException("Index already Exists");
         }
@@ -179,15 +179,15 @@ public class Table implements Serializable {
 
         // populate index
         int[] colIds = new int[columnNames.length];
-        for(int i = 0; i < columnNames.length; i++)
+        for (int i = 0; i < columnNames.length; i++)
             colIds[i] = colNameId.get(columnNames);
 
-        for(Page page : pages) {
+        for (Page page : pages) {
             Vector<Tuple> rows = page.loadAndGetData();
-            for(Tuple row : rows) {
+            for (Tuple row : rows) {
                 Vector<Comparable> rowData = row.getTupleData();
                 Vector<Comparable> values = new Vector<>();
-                for(int i = 0; i < columnNames.length; i++)
+                for (int i = 0; i < columnNames.length; i++)
                     values.add(rowData.get(colIds[i]));
                 newIndex.insertTuple(values, page.getFileName());
             }
@@ -379,4 +379,92 @@ public class Table implements Serializable {
         return sb.toString();
     }
 
+    private static final String AND = "AND", OR = "OR", XOR = "XOR";
+
+    public Iterator select(SQLTerm[] sqlTerms, String[] arrayOperators) throws DBAppException {
+        Vector<SQLTerm> segment = new Vector();
+        HashSet<String> pagesToOpen = new HashSet<>();
+        for (int i = 0; i < sqlTerms.length; i++) {
+            segment.add(sqlTerms[i]);
+            if (i == arrayOperators.length || !arrayOperators[i].equals(AND)) {
+                pagesToOpen.addAll(selectSegment(segment));
+                segment = new Vector<>();
+            }
+        }
+    }
+
+    public HashSet<String> selectSegment(Vector<SQLTerm> segment) throws DBAppException {
+        Hashtable<String, Range> range = new Hashtable<>();
+        for (SQLTerm sqlTerm : segment) {
+            int indexOfCol = colNames.indexOf(sqlTerm._strColumnName);
+            Range myNewRange = range.getOrDefault(sqlTerm._strColumnName,
+                    new Range(colMin.get(indexOfCol), colMax.get(indexOfCol))).intersect(sqlTerm);
+            if (myNewRange.isDegenerate()) {
+                return new HashSet<>();
+            }
+            range.put(sqlTerm._strColumnName, myNewRange);
+        }
+
+        GridIndex bestIndex = pickBestIndex(range);
+        if (bestIndex == null) {
+            return selectWithoutIndex(range);
+        } else {
+            return bestIndex.select(range);
+        }
+    }
+
+
+
+    private HashSet<String> selectWithoutIndex(Hashtable<String,Range> range) {
+
+    }
+
+    private GridIndex pickBestIndex(Hashtable<String, Range> range) throws DBAppException {
+        GridIndex bestIndex = null;
+        double bestScore = 1 - 1e-9;
+        for (GridIndex curIndex : indices) {
+            double curScore = getScoreOfIndex(range, curIndex);
+            if (curScore < bestScore) {
+                bestIndex = curIndex;
+                bestScore = curScore;
+            }
+        }
+        return bestIndex;
+    }
+
+    private double getScoreOfIndex(Hashtable<String, Range> range, GridIndex index) throws DBAppException {
+        double score = 1;
+        for (String colName : index.getColumns()) {
+            int indexOfCol = colNames.indexOf(colName);
+            Range myRange = range.get(colName);
+            if (myRange == null) {
+                continue;
+            }
+            double numerator = getNumericValue(myRange.max) - getNumericValue(myRange.min) + 1;
+            double denominator = getNumericValue(colMax.get(indexOfCol)) - getNumericValue(colMin.get(indexOfCol)) + 1;
+            score *= numerator / denominator;
+        }
+        return score;
+    }
+
+    private double getNumericValue(Comparable c) throws DBAppException {
+        if (c instanceof Integer || c instanceof Double) {
+            return (double) c;
+        } else if (c instanceof Date) {
+            return ((Date) c).getTime();
+        } else if (c instanceof String) {
+            String s = (String) c;
+            double val = 0;
+            double mult = 1;
+            for (int i = 0; i < 5; i++) {
+                if (4 - i >= s.length()) {
+                    val += 0;
+                } else {
+                    val += mult * (s.charAt(4 - i) - 'a' + 1);
+                }
+                mult *= 27;
+            }
+        }
+        throw new DBAppException();
+    }
 }

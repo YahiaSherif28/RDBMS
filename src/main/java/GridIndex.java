@@ -1,7 +1,9 @@
+import javax.xml.stream.events.Comment;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Vector;
 
 public class GridIndex implements Serializable {
@@ -49,37 +51,40 @@ public class GridIndex implements Serializable {
 
     public void insertTuple(Vector<Comparable> values, String pageName) {
         Vector<Integer> rangeIndices = getRangeIndicesFromValues(values);
-        insertInGridRec(grid, rangeIndices, 1, dimension, pageName);
+        insertInGridRec(grid, rangeIndices, values, 1, dimension, pageName);
     }
 
-    private void insertInGridRec(Object grid, Vector<Integer> rangeIndices, int curDimension, int maxDimension, String pageName) {
+    private void insertInGridRec(Object grid, Vector<Integer> rangeIndices, Vector<Comparable> values, int curDimension, int maxDimension, String pageName) {
         Object[] array = (Object[]) grid;
         Object nextObject = array[rangeIndices.get(curDimension - 1)];
         if(curDimension == maxDimension) {
             if(nextObject == null)
                 nextObject = array[rangeIndices.get(curDimension - 1)] = new Bucket();
-            ((Bucket)nextObject).add(pageName);
+            BucketPair insertedTuple = new BucketPair(values, pageName);
+            ((Bucket)nextObject).add(insertedTuple);
             return;
         }
-        insertInGridRec(nextObject, rangeIndices, curDimension + 1, maxDimension, pageName);
+        insertInGridRec(nextObject, rangeIndices, values, curDimension + 1, maxDimension, pageName);
     }
 
     public void deleteTuple(Vector<Comparable> values, String pageName) {
         Vector<Integer> indices = getRangeIndicesFromValues(values);
-        deleteFromGridRec(grid, indices, 1, dimension, pageName);
+        deleteFromGridRec(grid, indices, values, 1, dimension, pageName);
     }
 
-    private void deleteFromGridRec(Object grid, Vector<Integer> rangeIndices, int curDimension, int maxDimension, String pageName) {
+    private void deleteFromGridRec(Object grid, Vector<Integer> rangeIndices, Vector<Comparable> values, int curDimension, int maxDimension, String pageName) {
         Object[] array = (Object[]) grid;
         Object nextObject = array[rangeIndices.get(curDimension - 1)];
         if(curDimension == maxDimension) {
             if(nextObject == null)
                 nextObject = array[rangeIndices.get(curDimension - 1)] = new Bucket();
-            ((Bucket)nextObject).delete(pageName);
+            BucketPair deletedTuple = new BucketPair(values, pageName);
+            ((Bucket)nextObject).delete(deletedTuple);
             return;
         }
-        deleteFromGridRec(nextObject, rangeIndices, curDimension + 1, maxDimension, pageName);
+        deleteFromGridRec(nextObject, rangeIndices, values, curDimension + 1, maxDimension, pageName);
     }
+
 
     public boolean equals(String[] columns) {
         if(this.columns.length != columns.length)
@@ -96,6 +101,37 @@ public class GridIndex implements Serializable {
 
 
     public HashSet<String> select(Hashtable<String,Range> colNameToRange) {
+        Vector<Comparable> start = new Vector<>();
+        for (Map.Entry<String,Range> e :colNameToRange.entrySet()){
+            start.add(( Comparable) e.getValue().min);
+        }
+        Vector<Comparable> end = new Vector<>();
+        for (Map.Entry<String,Range> e :colNameToRange.entrySet()){
+            start.add(( Comparable) e.getValue().max);
+        }
+
+        Vector<Integer> startIndicies = getRangeIndicesFromValues(start);
+        Vector<Integer> endIndicies = getRangeIndicesFromValues(end);
+        return getAllPagesNames(grid,startIndicies,endIndicies,1,dimension);
+    }
+
+    private HashSet<String> getAllPagesNames(Object grid, Vector<Integer> startIndicies , Vector<Integer> endIndicies, int curDimension, int maxDimension) {
+        Object[] array = (Object[]) grid;
+        HashSet<String> retAll = new HashSet<>();
+        for(int i = startIndicies.get(curDimension-1); i<=endIndicies.get(curDimension-1); i++){
+        Object nextObject = array[i];
+        if(curDimension == maxDimension) {
+            if(nextObject == null)
+               return new HashSet<>();
+            HashSet<String> ret = new HashSet<>();
+            for (BucketPair p : ((Bucket)nextObject).getBuckets()){
+                ret.add(p.getPage());
+            }
+            return ret;
+        }
+            retAll.addAll(getAllPagesNames(nextObject, startIndicies,endIndicies, curDimension + 1, maxDimension));
+        }
+        return retAll;
     }
 
     // returns the names of pages to be open

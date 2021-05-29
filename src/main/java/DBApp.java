@@ -1,4 +1,5 @@
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class DBApp implements DBAppInterface {
@@ -190,6 +191,7 @@ public class DBApp implements DBAppInterface {
             }
         throw new DBAppException("This table doesn't exist");
     }
+
 
     @Override
     public void deleteFromTable(String tableName, Hashtable<String, Object> columnNameValue) throws DBAppException {

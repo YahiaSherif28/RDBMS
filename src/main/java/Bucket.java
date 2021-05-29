@@ -6,7 +6,7 @@ public class Bucket implements Serializable {
     private Bucket nextBucket;
     private Integer maxSize;
     private Integer curSize;
-    transient private Vector<String> pages;
+    transient private Vector<BucketPair> pages;
 
     public Bucket() {
         try {
@@ -14,7 +14,7 @@ public class Bucket implements Serializable {
             maxSize = DBApp.getMaximumKeysCountinIndexBucket();
             curSize = 0;
             nextBucket = null;
-            pages = new Vector<String>();
+            pages = new Vector<BucketPair>();
             closeBucket();
         } catch (Exception e) {
             e.printStackTrace();
@@ -23,7 +23,7 @@ public class Bucket implements Serializable {
 
     private void loadBucket() throws IOException, ClassNotFoundException {
         ObjectInputStream oi = new ObjectInputStream(new FileInputStream(bucketName));
-        pages = (Vector<String>) oi.readObject();
+        pages = (Vector<BucketPair>) oi.readObject();
         oi.close();
     }
 
@@ -35,33 +35,34 @@ public class Bucket implements Serializable {
         pages = null;
     }
 
-    public void add(String pageName) {
+
+    public void add(BucketPair insertedTuple) {
         if(curSize.equals(maxSize)) {
             if (nextBucket == null)
-                nextBucket = new Bucket();
-            nextBucket.add(pageName);
+                nextBucket = new Bucket();      //needed: increament & decreament curSize
+            nextBucket.add(insertedTuple);
         }
 
         try {
             loadBucket();
-            pages.add(pageName);
+            pages.add(insertedTuple);
             closeBucket();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void delete(String pageName) {
+    public void delete(BucketPair deletedTuple) {
         try {
             loadBucket();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        if(pages.contains(pageName))
-            pages.remove(pageName);
+        if (pages.contains(deletedTuple))
+            pages.remove(deletedTuple);
         else
-            nextBucket.delete(pageName);
+            nextBucket.delete(deletedTuple);
 
         try {
             closeBucket();

@@ -472,7 +472,7 @@ public class Table implements Serializable {
         Vector<Tuple> result = new Vector<>();
         for (Page p : pages) {
             if (pagesToOpen.contains(p.getFileName())) {
-                result.addAll(p.select(sqlTerms, arrayOperators));
+                result.addAll(p.select(sqlTerms, arrayOperators,colNameId));
             }
         }
         closeTable();

@@ -3,6 +3,7 @@ import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Vector;
 
 public class GridIndex implements Serializable {
@@ -100,7 +101,37 @@ public class GridIndex implements Serializable {
 
 
     public HashSet<String> select(Hashtable<String,Range> colNameToRange) {
-        return null;
+        Vector<Comparable> start = new Vector<>();
+        for (Map.Entry<String,Range> e :colNameToRange.entrySet()){
+            start.add(( Comparable) e.getValue().min);
+        }
+        Vector<Comparable> end = new Vector<>();
+        for (Map.Entry<String,Range> e :colNameToRange.entrySet()){
+            start.add(( Comparable) e.getValue().max);
+        }
+
+        Vector<Integer> startIndicies = getRangeIndicesFromValues(start);
+        Vector<Integer> endIndicies = getRangeIndicesFromValues(end);
+        return getAllPagesNames(grid,startIndicies,endIndicies,1,dimension);
+    }
+
+    private HashSet<String> getAllPagesNames(Object grid, Vector<Integer> startIndicies , Vector<Integer> endIndicies, int curDimension, int maxDimension) {
+        Object[] array = (Object[]) grid;
+        HashSet<String> retAll = new HashSet<>();
+        for(int i = startIndicies.get(curDimension-1); i<=endIndicies.get(curDimension-1); i++){
+        Object nextObject = array[i];
+        if(curDimension == maxDimension) {
+            if(nextObject == null)
+               return new HashSet<>();
+            HashSet<String> ret = new HashSet<>();
+            for (BucketPair p : ((Bucket)nextObject).getBuckets()){
+                ret.add(p.getPage());
+            }
+            return ret;
+        }
+            retAll.addAll(getAllPagesNames(nextObject, startIndicies,endIndicies, curDimension + 1, maxDimension));
+        }
+        return retAll;
     }
 
     // returns the names of pages to be open

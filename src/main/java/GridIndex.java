@@ -84,6 +84,7 @@ public class GridIndex implements Serializable {
         deleteFromGridRec(nextObject, rangeIndices, values, curDimension + 1, maxDimension, pageName);
     }
 
+
     public boolean equals(String[] columns) {
         if(this.columns.length != columns.length)
             return false;

@@ -200,6 +200,33 @@ public class Table implements Serializable {
         }
     }
 
+    private void updateIndex (String clusteringKeyValue, Hashtable<String, Object> columnNameValue) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+
+        String type = colTypes.get(indexOfClusteringKey);               // we can use select * where pk = clusteringKeyValue
+        Comparable key = stringToComparable(clusteringKeyValue, type);
+        Page oldPage = pages.get(binarySearch(key)) ;
+        Vector<Comparable> tupleValues = oldPage.getTuple(key).getTupleData() ;
+
+        for (GridIndex index : indices ){                                        // get the involved indices
+            Vector<Comparable> oldColumnsValues = new Vector<Comparable>() ;
+             for (String indexColumn : index.getColumns()) {                       // get the old values inserted in the index
+                 oldColumnsValues.add(tupleValues.get(colNameId.get(indexColumn))) ;
+            }
+             index.deleteTuple(oldColumnsValues , oldPage.getFileName());
+             Vector<Comparable> newColumnValues = new Vector<Comparable>() ;
+             for (String indexColumn : index.getColumns() ) {
+                 if (columnNameValue.keySet().contains(indexColumn)) {
+                     newColumnValues.add((Comparable) columnNameValue.get(indexColumn)) ;
+                 }
+                 else
+                     newColumnValues.add(tupleValues.get(colNameId.get(indexColumn))) ;
+             }
+             index.insertTuple(newColumnValues,oldPage.getFileName());
+        }
+    }
+
+
+
     private int binarySearch(Comparable key) {
         int lo = 0;
         int hi = pages.size() - 1;
@@ -261,6 +288,7 @@ public class Table implements Serializable {
             }
         }
 
+
         try {
             add(new Tuple(newTupleVector, indexOfClusteringKey));
         } catch (IOException | ClassNotFoundException e) {
@@ -273,12 +301,23 @@ public class Table implements Serializable {
         }
     }
 
-    public void updateTuple(String clusteringKeyValue, Hashtable<String, Object> colNameValue) throws DBAppException {
+
+
+    public void updateTuple(String clusteringKeyValue, Hashtable<String, Object> colNameValue) throws DBAppException{
         try {
             loadTable();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+
+        try {
+            updateIndex(clusteringKeyValue, colNameValue) ;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
         String type = colTypes.get(indexOfClusteringKey);
 
         Comparable key = null;

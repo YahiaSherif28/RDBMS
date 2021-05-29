@@ -102,19 +102,7 @@ public class Page implements Serializable {
             e.printStackTrace();
         }
 
-
-        int l = 0;
-        int h = data.size() - 1;
-        int id = -1;
-        while (l <= h) {
-            int mid = (l + h) / 2;
-            if (data.get(mid).getPK().compareTo(key) <= 0) {
-                if (data.get(mid).getPK().compareTo(key) == 0) id = mid;
-                l = mid + 1;
-            } else {
-                h = mid - 1;
-            }
-        }
+        int id = searchForTuple(key) ;
 
         if (id == -1) return;
 
@@ -128,6 +116,25 @@ public class Page implements Serializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public Tuple getTuple (Comparable key) {
+        return data.get(searchForTuple(key)) ;
+    }
+    private int searchForTuple (Comparable key) {
+        int l = 0;
+        int h = data.size() - 1;
+        int id = -1;
+        while (l <= h) {
+            int mid = (l + h) / 2;
+            if (data.get(mid).getPK().compareTo(key) <= 0) {
+                if (data.get(mid).getPK().compareTo(key) == 0) id = mid;
+                l = mid + 1;
+            } else {
+                h = mid - 1;
+            }
+        }
+        return id ;
     }
 
     public void deleteTuples(Hashtable<Integer, Comparable> colNameVal) {

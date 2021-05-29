@@ -35,10 +35,11 @@ public class Bucket implements Serializable {
         pages = null;
     }
 
+
     public void add(BucketPair insertedTuple) {
         if(curSize.equals(maxSize)) {
             if (nextBucket == null)
-                nextBucket = new Bucket();
+                nextBucket = new Bucket();      //needed: increament & decreament curSize
             nextBucket.add(insertedTuple);
         }
 

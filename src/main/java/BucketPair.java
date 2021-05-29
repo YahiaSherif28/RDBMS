@@ -14,4 +14,7 @@ public class BucketPair implements Serializable {
         BucketPair b = (BucketPair) o;
         return this.value.equals(b.value) && this.page.equals(b.page);
     }
+    public String getPage () {
+        return page ;
+    }
 }

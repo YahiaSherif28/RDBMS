@@ -243,22 +243,27 @@ public class Table implements Serializable {
         return Math.max(ans - 1, 0);
     }
 
-    public void add(Tuple row) throws IOException, ClassNotFoundException, DBAppException {
+    public Page add(Tuple row) throws IOException, ClassNotFoundException, DBAppException {
+       Page returnPage ;
         if (pages.isEmpty()) {
             Page newPage = new Page(DBApp.getNextPageName());
             newPage.getData().add(row);
             newPage.closePage();
             pages.add(newPage);
-            return;
+            returnPage = newPage ;
         }
         int insertionIndex = binarySearch(row.getPK());
         if (pages.get(insertionIndex).isFull()) {
             pages.get(insertionIndex).add(row);
             Page newPage = pages.get(insertionIndex).split();
             pages.add(insertionIndex + 1, newPage);
+            int tupleIndex = pages.get(insertionIndex).searchForTuple(row.getPK()) ;
+            returnPage = tupleIndex == -1 ? newPage : pages.get(insertionIndex) ;
         } else {
             pages.get(insertionIndex).add(row);
+            returnPage = pages.get(insertionIndex) ;
         }
+        return returnPage ;
     }
 
     public void insertTuple(Hashtable<String, Object> colNameValue) throws DBAppException {
@@ -290,7 +295,10 @@ public class Table implements Serializable {
 
 
         try {
-            add(new Tuple(newTupleVector, indexOfClusteringKey));
+            Tuple newTuple = new Tuple(newTupleVector, indexOfClusteringKey) ;
+            Page newPage = add(newTuple);
+            populateRowIndex(newTuple, newPage);
+
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -298,6 +306,17 @@ public class Table implements Serializable {
             closeTable();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void populateRowIndex (Tuple insertTuple , Page insertPage ) {
+        for (GridIndex index : indices ){
+            Vector<Comparable> tupleValues = insertTuple.getTupleData();
+            Vector<Comparable> newValues = new Vector<Comparable>() ;
+            for (String indexColumn : index.getColumns())  {
+                newValues.add(tupleValues.get(colNameId.get(indexColumn))) ;
+            }
+            index.insertTuple(newValues,insertPage.getFileName());
         }
     }
 
@@ -367,7 +386,8 @@ public class Table implements Serializable {
         }
         Vector<Page> newPages = new Vector<>();
         for (Page p : pages) {
-            p.deleteTuples(colNameVal);
+            Vector<Tuple> deletedTuples =  p.deleteTuples(colNameVal);
+            deleteFromIndex(p,deletedTuples);
             if (!p.isEmpty()) {
                 newPages.add(p);
             }
@@ -377,6 +397,19 @@ public class Table implements Serializable {
             closeTable();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void deleteFromIndex (Page deletePage , Vector<Tuple> deletedTuples) {
+        for (Tuple tuple : deletedTuples) {
+            Vector<Comparable> tupleValues = tuple.getTupleData() ;
+            for (GridIndex index : indices) {
+                Vector<Comparable> indexValues = new Vector<Comparable>() ;
+                for (String indexColumn : index.getColumns()) {
+                    indexValues.add(tupleValues.get(colNameId.get(indexColumn))) ;
+                }
+                index.deleteTuple(indexValues,deletePage.getFileName());
+            }
         }
     }
 

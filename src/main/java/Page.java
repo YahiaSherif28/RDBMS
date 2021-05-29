@@ -121,7 +121,7 @@ public class Page implements Serializable {
     public Tuple getTuple (Comparable key) {
         return data.get(searchForTuple(key)) ;
     }
-    private int searchForTuple (Comparable key) {
+    public int searchForTuple (Comparable key) {
         int l = 0;
         int h = data.size() - 1;
         int id = -1;
@@ -137,19 +137,21 @@ public class Page implements Serializable {
         return id ;
     }
 
-    public void deleteTuples(Hashtable<Integer, Comparable> colNameVal) {
+    public Vector<Tuple> deleteTuples(Hashtable<Integer, Comparable> colNameVal) {
         try {
             loadPage();
         } catch (Exception e) {
             e.printStackTrace();
         }
         Vector<Tuple> newData = new Vector<>();
+        Vector<Tuple> deletedTuples = new Vector<Tuple>() ;
         for (Tuple t : data) {
             boolean f = true;
             for (Map.Entry<Integer, Comparable> e : colNameVal.entrySet()) {
                 f &= t.getTupleData().get(e.getKey()).compareTo(e.getValue()) == 0;
             }
             if (!f) newData.add(t);
+            else deletedTuples.add(t) ;
         }
 
         data = newData;
@@ -158,6 +160,7 @@ public class Page implements Serializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return deletedTuples ;
     }
 
     public boolean isFull() {

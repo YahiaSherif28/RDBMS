@@ -17,7 +17,7 @@ public class DBApp implements DBAppInterface {
     private Vector<Table> tables;
 
     public DBApp() {
-        init();
+        //init();
     }
 
     public static int getMaximumRowsCountinTablePage() {

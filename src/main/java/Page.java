@@ -122,6 +122,11 @@ public class Page implements Serializable {
         return data.get(searchForTuple(key)) ;
     }
     public int searchForTuple (Comparable key) {
+        try {
+            loadPage();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         int l = 0;
         int h = data.size() - 1;
         int id = -1;
@@ -134,6 +139,13 @@ public class Page implements Serializable {
                 h = mid - 1;
             }
         }
+
+        try {
+            closePage();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return id ;
     }
 
@@ -200,9 +212,9 @@ public class Page implements Serializable {
 
     public boolean seprateOr(SQLTerm[] sqlTerms, String[] arrayOperators , int start , int end,Tuple t , TreeMap<String,Integer> colNameId) throws DBAppException {
         for (int i =start; i<end; i++ ){
-                if(arrayOperators[i].equals("OR")){
-                    return seprateXor(sqlTerms,arrayOperators,start,i,t ,colNameId)||seprateOr(sqlTerms,arrayOperators,i+1,end,t , colNameId);
-                }
+            if(arrayOperators[i].equals("OR")){
+                return seprateXor(sqlTerms,arrayOperators,start,i,t ,colNameId)||seprateOr(sqlTerms,arrayOperators,i+1,end,t , colNameId);
+            }
         }
         return seprateXor(sqlTerms,arrayOperators,start,end,t,colNameId);
     }
@@ -227,7 +239,7 @@ public class Page implements Serializable {
 
     public boolean checkTerm(SQLTerm[] sqlTerms, String[] arrayOperators , int start , int end,Tuple t , TreeMap<String,Integer> colNameId) throws DBAppException {
         if(start!=end ){
-           throw new DBAppException("ERROR IN SEPRATING");
+            throw new DBAppException("ERROR IN SEPRATING");
         }
         return evaluate(sqlTerms[start] , t , colNameId );
     }

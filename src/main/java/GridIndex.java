@@ -10,13 +10,11 @@ public class GridIndex implements Serializable {
     private Integer dimension;
     private String[] columns;
     private Comparable[][] minRange;
-    private Comparable[][] maxRange;
     private Object[] grid;
 
-    public GridIndex(String[] columns, Comparable[][] minRange, Comparable[][] maxRange) {
+    public GridIndex(String[] columns, Comparable[][] minRange) {
         this.columns = columns;
         this.minRange = minRange;
-        this.maxRange = maxRange;
         this.dimension = columns.length;
 
         grid = new Object[11];
@@ -39,11 +37,17 @@ public class GridIndex implements Serializable {
             if(colVal == null)
                 rangeIndices.add(0);
             else {
-                for(int j = 0; j < 10; j++)
-                    if(colVal.compareTo(minRange[i][j]) >= 0 && colVal.compareTo(maxRange[i][j]) <= 0) {
-                        rangeIndices.add(j + 1);
+                if(colVal instanceof MyString)
+                    colVal = ((MyString) colVal).hashValue();
+                boolean inserted = false;
+                for(int j = 1; j < 10; j++)
+                    if(colVal.compareTo(minRange[i][j]) < 0) {
+                        rangeIndices.add(j);
+                        inserted = true;
                         break;
                     }
+                if(!inserted)
+                    rangeIndices.add(10);
             }
         }
         return rangeIndices;

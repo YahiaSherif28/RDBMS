@@ -101,13 +101,15 @@ public class GridIndex implements Serializable {
 
 
     public HashSet<String> select(Hashtable<String,Range> colNameToRange) {
+
         Vector<Comparable> start = new Vector<>();
-        for (Map.Entry<String,Range> e :colNameToRange.entrySet()){
-            start.add(( Comparable) e.getValue().min);
+        for(String s: columns){
+            start.add(colNameToRange.get(s).min);
         }
+
         Vector<Comparable> end = new Vector<>();
-        for (Map.Entry<String,Range> e :colNameToRange.entrySet()){
-            start.add(( Comparable) e.getValue().max);
+        for(String s: columns){
+            end.add(colNameToRange.get(s).max);
         }
 
         Vector<Integer> startIndicies = getRangeIndicesFromValues(start);

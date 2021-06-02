@@ -202,11 +202,19 @@ public class Page implements Serializable {
         return sb.toString();
     }
 
-    public Vector<Tuple> select(SQLTerm[] sqlTerms, String[] arrayOperators , TreeMap<String,Integer> colNameId) throws DBAppException {
+    public Vector<Tuple> select(SQLTerm[] sqlTerms, String[] arrayOperators , TreeMap<String,Integer> colNameId) throws DBAppException, IOException {
+        try {
+            loadPage();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         Vector<Tuple> ret = new Vector<>();
         for (Tuple t : this.data){
             if(seprateOr(sqlTerms,arrayOperators,0,sqlTerms.length-1 , t , colNameId)) ret.add(t);
         }
+        closePage();
         return ret;
     }
 

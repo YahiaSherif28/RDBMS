@@ -21,9 +21,13 @@ public class Bucket implements Serializable {
         }
     }
 
-    public Vector<BucketPair> getBuckets () {
-        return  this.pages ;
+    public Vector<BucketPair> getBuckets() throws IOException, ClassNotFoundException {
+        loadBucket();
+        Vector<BucketPair> res = this.pages;
+        closeBucket();
+        return res;
     }
+
     private void loadBucket() throws IOException, ClassNotFoundException {
         ObjectInputStream oi = new ObjectInputStream(new FileInputStream(bucketName));
         pages = (Vector<BucketPair>) oi.readObject();
@@ -40,7 +44,7 @@ public class Bucket implements Serializable {
 
 
     public void add(BucketPair insertedTuple) {
-        if(curSize.equals(maxSize)) {
+        if (curSize.equals(maxSize)) {
             if (nextBucket == null)
                 nextBucket = new Bucket();      //needed: increament & decreament curSize
             nextBucket.add(insertedTuple);

@@ -1,4 +1,5 @@
 import javax.xml.stream.events.Comment;
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.HashSet;
@@ -104,7 +105,7 @@ public class GridIndex implements Serializable {
     }
 
 
-    public HashSet<String> select(Hashtable<String,Range> colNameToRange) {
+    public HashSet<String> select(Hashtable<String,Range> colNameToRange) throws IOException, ClassNotFoundException {
 
         Vector<Comparable> start = new Vector<>();
         for(String s: columns){
@@ -121,7 +122,7 @@ public class GridIndex implements Serializable {
         return getAllPagesNames(grid,startIndicies,endIndicies,1,dimension);
     }
 
-    private HashSet<String> getAllPagesNames(Object grid, Vector<Integer> startIndicies , Vector<Integer> endIndicies, int curDimension, int maxDimension) {
+    private HashSet<String> getAllPagesNames(Object grid, Vector<Integer> startIndicies , Vector<Integer> endIndicies, int curDimension, int maxDimension) throws IOException, ClassNotFoundException {
         Object[] array = (Object[]) grid;
         HashSet<String> retAll = new HashSet<>();
         for(int i = startIndicies.get(curDimension-1); i<=endIndicies.get(curDimension-1); i++){

@@ -37,7 +37,7 @@ public class Table implements Serializable {
         colMin = new Vector<>();
         colMax = new Vector<>();
         colIndex = new Vector<>();
-        for(int i = 0; i < colNames.size(); i++)
+        for (int i = 0; i < colNames.size(); i++)
             colIndex.add(false);
 
         colNameId = new TreeMap<>();
@@ -159,40 +159,40 @@ public class Table implements Serializable {
 
     public Comparable[][] getColumnRange(String[] columnNames) {
         Comparable[][] minRange = new Comparable[columnNames.length][10];
-        for(int i = 0; i < columnNames.length; i++) {
+        for (int i = 0; i < columnNames.length; i++) {
             String columnName = columnNames[i];
             int columnIndex = colNameId.get(columnName);
             String columnType = colTypes.get(columnIndex);
-            if(columnType.equals("java.lang.Integer")) {
-                Integer min = (Integer)colMin.get(columnIndex);
-                Integer max = (Integer)colMax.get(columnIndex);
+            if (columnType.equals("java.lang.Integer")) {
+                Integer min = (Integer) colMin.get(columnIndex);
+                Integer max = (Integer) colMax.get(columnIndex);
                 int step = (max - min + 1 + 9) / 10;
                 minRange[i][0] = min;
-                for(int j = 1; j < 10; j++)
-                    minRange[i][j] = (Integer)minRange[i][j - 1] + step;
-            } else if(columnType.equals("java.lang.Double")) {
-                Double min = (Double)colMin.get(columnIndex);
-                Double max = (Double)colMax.get(columnIndex);
+                for (int j = 1; j < 10; j++)
+                    minRange[i][j] = (Integer) minRange[i][j - 1] + step;
+            } else if (columnType.equals("java.lang.Double")) {
+                Double min = (Double) colMin.get(columnIndex);
+                Double max = (Double) colMax.get(columnIndex);
                 double step = (max - min + 1) / 10;
                 minRange[i][0] = min;
-                for(int j = 1; j < 10; j++)
-                    minRange[i][j] = (Double)minRange[i][j - 1] + step;
-            } else if(columnType.equals("java.util.Date")) {
-                long min = ((Date)colMin.get(columnIndex)).getTime();
-                long max = ((Date)colMax.get(columnIndex)).getTime();
+                for (int j = 1; j < 10; j++)
+                    minRange[i][j] = (Double) minRange[i][j - 1] + step;
+            } else if (columnType.equals("java.util.Date")) {
+                long min = ((Date) colMin.get(columnIndex)).getTime();
+                long max = ((Date) colMax.get(columnIndex)).getTime();
                 long step = (max - min + 1 + 9) / 10;
                 minRange[i][0] = new Date(min);
-                for(int j = 1; j < 10; j++)
-                    minRange[i][j] = new Date(((Date)minRange[i][j - 1]).getTime() + step);
+                for (int j = 1; j < 10; j++)
+                    minRange[i][j] = new Date(((Date) minRange[i][j - 1]).getTime() + step);
             } else {
-                MyString minString = (MyString)colMin.get(columnIndex);
-                MyString maxString = (MyString)colMax.get(columnIndex);
+                MyString minString = (MyString) colMin.get(columnIndex);
+                MyString maxString = (MyString) colMax.get(columnIndex);
                 long min = minString.hashValue();
                 long max = maxString.hashValue();
                 long step = (max - min + 1 + 9) / 10;
                 minRange[i][0] = min;
-                for(int j = 1; j < 10; j++)
-                    minRange[i][j] = (Long)minRange[i][j - 1] + step;
+                for (int j = 1; j < 10; j++)
+                    minRange[i][j] = (Long) minRange[i][j - 1] + step;
             }
         }
         return minRange;
@@ -243,8 +243,8 @@ public class Table implements Serializable {
         }
 
         // update index boolean
-        for(int i : colIds)
-           colIndex.set(i, true);
+        for (int i : colIds)
+            colIndex.set(i, true);
 
         try {
             closeTable();
@@ -257,24 +257,23 @@ public class Table implements Serializable {
 
         String type = colTypes.get(indexOfClusteringKey);               // we can use select * where pk = clusteringKeyValue
         Comparable key = stringToComparable(clusteringKeyValue, type);
-        Page oldPage = pages.get(binarySearch(key)) ;
-        Vector<Comparable> tupleValues = oldPage.getTuple(key).getTupleData() ;
+        Page oldPage = pages.get(binarySearch(key));
+        Vector<Comparable> tupleValues = oldPage.getTuple(key).getTupleData();
 
-        for (GridIndex index : indices ){                                        // get the involved indices
-            Vector<Comparable> oldColumnsValues = new Vector<Comparable>() ;
-             for (String indexColumn : index.getColumns()) {                       // get the old values inserted in the index
-                 oldColumnsValues.add(tupleValues.get(colNameId.get(indexColumn))) ;
+        for (GridIndex index : indices) {                                        // get the involved indices
+            Vector<Comparable> oldColumnsValues = new Vector<Comparable>();
+            for (String indexColumn : index.getColumns()) {                       // get the old values inserted in the index
+                oldColumnsValues.add(tupleValues.get(colNameId.get(indexColumn)));
             }
-             index.deleteTuple(oldColumnsValues , oldPage.getFileName());
-             Vector<Comparable> newColumnValues = new Vector<Comparable>() ;
-             for (String indexColumn : index.getColumns() ) {
-                 if (columnNameValue.keySet().contains(indexColumn)) {
-                     newColumnValues.add((Comparable) columnNameValue.get(indexColumn)) ;
-                 }
-                 else
-                     newColumnValues.add(tupleValues.get(colNameId.get(indexColumn))) ;
-             }
-             index.insertTuple(newColumnValues,oldPage.getFileName());
+            index.deleteTuple(oldColumnsValues, oldPage.getFileName());
+            Vector<Comparable> newColumnValues = new Vector<Comparable>();
+            for (String indexColumn : index.getColumns()) {
+                if (columnNameValue.keySet().contains(indexColumn)) {
+                    newColumnValues.add((Comparable) columnNameValue.get(indexColumn));
+                } else
+                    newColumnValues.add(tupleValues.get(colNameId.get(indexColumn)));
+            }
+            index.insertTuple(newColumnValues, oldPage.getFileName());
         }
     }
 
@@ -312,10 +311,10 @@ public class Table implements Serializable {
             int tupleIndex = pages.get(insertionIndex).searchForTuple(row.getPK());
             boolean insertedInNewPage = tupleIndex == -1 ? true : false;
 
-            if(!insertedInNewPage)
+            if (!insertedInNewPage)
                 populateRowIndex(row, pages.get(insertionIndex).getFileName());
             String newPageName = newPage.getFileName();
-            for(Tuple tuple : newPage.loadAndGetData())
+            for (Tuple tuple : newPage.loadAndGetData())
                 populateRowIndex(tuple, newPageName);
         } else {
             Page insertionPage = pages.get(insertionIndex);
@@ -353,7 +352,7 @@ public class Table implements Serializable {
 
 
         try {
-            Tuple newTuple = new Tuple(newTupleVector, indexOfClusteringKey) ;
+            Tuple newTuple = new Tuple(newTupleVector, indexOfClusteringKey);
             add(newTuple);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -365,18 +364,18 @@ public class Table implements Serializable {
         }
     }
 
-    private void populateRowIndex (Tuple insertTuple , String insertPageName ) {
+    private void populateRowIndex(Tuple insertTuple, String insertPageName) {
         for (GridIndex index : indices) {
             Vector<Comparable> tupleValues = insertTuple.getTupleData();
-            Vector<Comparable> newValues = new Vector<Comparable>() ;
-            for (String indexColumn : index.getColumns())  {
-                newValues.add(tupleValues.get(colNameId.get(indexColumn))) ;
+            Vector<Comparable> newValues = new Vector<Comparable>();
+            for (String indexColumn : index.getColumns()) {
+                newValues.add(tupleValues.get(colNameId.get(indexColumn)));
             }
             index.insertTuple(newValues, insertPageName);
         }
     }
 
-    public void updateTuple(String clusteringKeyValue, Hashtable<String, Object> colNameValue) throws DBAppException{
+    public void updateTuple(String clusteringKeyValue, Hashtable<String, Object> colNameValue) throws DBAppException {
         try {
             loadTable();
         } catch (IOException | ClassNotFoundException e) {
@@ -384,9 +383,8 @@ public class Table implements Serializable {
         }
 
         try {
-            updateIndex(clusteringKeyValue, colNameValue) ;
-        }
-        catch (Exception e) {
+            updateIndex(clusteringKeyValue, colNameValue);
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -440,8 +438,8 @@ public class Table implements Serializable {
         }
         Vector<Page> newPages = new Vector<>();
         for (Page p : pages) {
-            Vector<Tuple> deletedTuples =  p.deleteTuples(colNameVal);
-            deleteFromIndex(p,deletedTuples);
+            Vector<Tuple> deletedTuples = p.deleteTuples(colNameVal);
+            deleteFromIndex(p, deletedTuples);
             if (!p.isEmpty()) {
                 newPages.add(p);
             }
@@ -454,15 +452,15 @@ public class Table implements Serializable {
         }
     }
 
-    private void deleteFromIndex (Page deletePage , Vector<Tuple> deletedTuples) {
+    private void deleteFromIndex(Page deletePage, Vector<Tuple> deletedTuples) {
         for (Tuple tuple : deletedTuples) {
-            Vector<Comparable> tupleValues = tuple.getTupleData() ;
+            Vector<Comparable> tupleValues = tuple.getTupleData();
             for (GridIndex index : indices) {
-                Vector<Comparable> indexValues = new Vector<Comparable>() ;
+                Vector<Comparable> indexValues = new Vector<Comparable>();
                 for (String indexColumn : index.getColumns()) {
-                    indexValues.add(tupleValues.get(colNameId.get(indexColumn))) ;
+                    indexValues.add(tupleValues.get(colNameId.get(indexColumn)));
                 }
-                index.deleteTuple(indexValues,deletePage.getFileName());
+                index.deleteTuple(indexValues, deletePage.getFileName());
             }
         }
     }
@@ -513,8 +511,8 @@ public class Table implements Serializable {
             if (!colNames.contains(s._strColumnName)) {
                 throw new DBAppException("Table doesn't contain this column");
             }
-            if(s._objValue instanceof String)
-                s._objValue = new MyString((String)s._objValue);
+            if (s._objValue instanceof String)
+                s._objValue = new MyString((String) s._objValue);
         }
         Vector<SQLTerm> segment = new Vector();
         HashSet<String> pagesToOpen = new HashSet<>();
@@ -528,14 +526,14 @@ public class Table implements Serializable {
         Vector<Tuple> result = new Vector<>();
         for (Page p : pages) {
             if (pagesToOpen.contains(p.getFileName())) {
-                result.addAll(p.select(sqlTerms, arrayOperators,colNameId));
+                result.addAll(p.select(sqlTerms, arrayOperators, colNameId));
             }
         }
         closeTable();
         return result.iterator();
     }
 
-    public HashSet<String> selectSegment(Vector<SQLTerm> segment) throws DBAppException {
+    public HashSet<String> selectSegment(Vector<SQLTerm> segment) throws DBAppException, IOException, ClassNotFoundException {
         Hashtable<String, Range> range = new Hashtable<>();
         for (SQLTerm sqlTerm : segment) {
             int indexOfCol = colNames.indexOf(sqlTerm._strColumnName);
@@ -551,6 +549,14 @@ public class Table implements Serializable {
         if (bestIndex == null) {
             return selectWithoutIndex(range);
         } else {
+            for (String s : bestIndex.getColumns()) {
+                if (!range.containsKey(s)) {
+                    int colIndex = colNameId.get(s);
+                    Comparable min = colMin.get(colIndex);
+                    Comparable max = colMax.get(colIndex);
+                    range.put(s, new Range(min, max));
+                }
+            }
             return bestIndex.select(range);
         }
     }
@@ -602,8 +608,8 @@ public class Table implements Serializable {
             return (double) c;
         } else if (c instanceof Date) {
             return ((Date) c).getTime();
-        } else if (c instanceof String) {
-            String s = (String) c;
+        } else if (c instanceof MyString) {
+            String s = ((MyString) c).toString();
             double val = 0;
             double mult = 1;
             for (int i = 0; i < 5; i++) {
@@ -614,6 +620,7 @@ public class Table implements Serializable {
                 }
                 mult *= 27;
             }
+            return val;
         }
         throw new DBAppException();
     }

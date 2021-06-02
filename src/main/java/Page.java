@@ -201,28 +201,28 @@ public class Page implements Serializable {
     public boolean seprateOr(SQLTerm[] sqlTerms, String[] arrayOperators , int start , int end,Tuple t , TreeMap<String,Integer> colNameId) throws DBAppException {
         for (int i =start; i<end; i++ ){
                 if(arrayOperators[i].equals("OR")){
-                    return seprateAnd(sqlTerms,arrayOperators,start,i,t ,colNameId)||seprateOr(sqlTerms,arrayOperators,i+1,end,t , colNameId);
+                    return seprateXor(sqlTerms,arrayOperators,start,i,t ,colNameId)||seprateOr(sqlTerms,arrayOperators,i+1,end,t , colNameId);
                 }
         }
-        return seprateAnd(sqlTerms,arrayOperators,start,end,t,colNameId);
+        return seprateXor(sqlTerms,arrayOperators,start,end,t,colNameId);
     }
 
     public boolean seprateAnd(SQLTerm[] sqlTerms, String[] arrayOperators , int start , int end,Tuple t , TreeMap<String,Integer> colNameId) throws DBAppException {
         for (int i =start; i<end; i++ ){
             if(arrayOperators[i].equals("AND")){
-                return seprateXor(sqlTerms,arrayOperators,start,i,t ,colNameId)&&seprateAnd(sqlTerms,arrayOperators,i+1,end,t , colNameId);
+                return checkTerm(sqlTerms,arrayOperators,start,i,t ,colNameId)&&seprateAnd(sqlTerms,arrayOperators,i+1,end,t , colNameId);
             }
         }
-        return seprateXor(sqlTerms,arrayOperators,start,end,t,colNameId);
+        return checkTerm(sqlTerms,arrayOperators,start,end,t,colNameId);
     }
 
     public boolean seprateXor(SQLTerm[] sqlTerms, String[] arrayOperators , int start , int end,Tuple t , TreeMap<String,Integer> colNameId) throws DBAppException {
         for (int i =start; i<end; i++ ){
             if(arrayOperators[i].equals("XOR")){
-                return checkTerm(sqlTerms,arrayOperators,start,i,t ,colNameId)^seprateXor(sqlTerms,arrayOperators,i+1,end,t , colNameId);
+                return seprateAnd(sqlTerms,arrayOperators,start,i,t ,colNameId)^seprateXor(sqlTerms,arrayOperators,i+1,end,t , colNameId);
             }
         }
-        return checkTerm(sqlTerms,arrayOperators,start,end,t,colNameId);
+        return seprateAnd(sqlTerms,arrayOperators,start,end,t,colNameId);
     }
 
     public boolean checkTerm(SQLTerm[] sqlTerms, String[] arrayOperators , int start , int end,Tuple t , TreeMap<String,Integer> colNameId) throws DBAppException {

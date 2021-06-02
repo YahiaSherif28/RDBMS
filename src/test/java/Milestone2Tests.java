@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -272,6 +273,8 @@ public class Milestone2Tests {
         String[]strarrOperators = new String[1];
         strarrOperators[0] = "AND";
 // select * from Student where name = “John Noor” or gpa = 1.5;
+        System.out.println(Arrays.toString(arrSQLTerms));
+        System.out.println(Arrays.toString(strarrOperators));
         DBApp dbApp = new DBApp();
         dbApp.init();
         Iterator resultSet = dbApp.selectFromTable(arrSQLTerms , strarrOperators);

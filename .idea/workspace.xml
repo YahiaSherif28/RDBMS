@@ -4,55 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1bacc2ee-069a-4fec-a21b-516da4de8106" name="Default Changelist" comment="Complete select">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Bucket.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Bucket.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Table.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Table.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/DBApp.config" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/DBApp.config" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/nextBucketName.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/nextBucketName.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/nextPageName.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/nextPageName.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/1.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/pages/1.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/10.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/pages/10.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/11.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/pages/11.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/12.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/pages/12.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/2.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/pages/2.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/3.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/pages/3.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/4.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/pages/4.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/5.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/pages/5.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/6.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/pages/6.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/7.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/pages/7.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/8.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/pages/8.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/9.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/pages/9.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/tables.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/tables/courses.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/tables/courses.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/tables/pcs.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/tables/pcs.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/tables/students.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/tables/students.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/tables/transcripts.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/tables/transcripts.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Bucket.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Bucket.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/DBApp.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/DBApp.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/GridIndex.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/GridIndex.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/MyString.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/MyString.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Page.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Page.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SQLTerm.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/SQLTerm.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Table.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Table.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/data/nextPageName.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/data/pages/1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/data/pages/10.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/data/pages/11.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/data/pages/12.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/data/pages/2.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/data/pages/3.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/data/pages/4.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/data/pages/5.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/data/pages/6.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/data/pages/7.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/data/pages/8.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/data/pages/9.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/data/tables.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/data/tables/courses.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/data/tables/pcs.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/data/tables/students.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/data/tables/transcripts.class" beforeDir="false" />
+    <list default="true" id="1bacc2ee-069a-4fec-a21b-516da4de8106" name="Default Changelist" comment="Fix bugs">
+      <change beforePath="$PROJECT_DIR$/src/test/java/Milestone2Tests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/Milestone2Tests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/metadata.csv" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/metadata.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -159,7 +113,7 @@
       <workItem from="1622036484888" duration="2412000" />
       <workItem from="1622118278560" duration="10486000" />
       <workItem from="1622325225293" duration="3066000" />
-      <workItem from="1622652940973" duration="2389000" />
+      <workItem from="1622652940973" duration="2916000" />
     </task>
     <task id="LOCAL-00001" summary="Fix problems with converting from String to Date">
       <created>1619441009263</created>
@@ -252,7 +206,14 @@
       <option name="project" value="LOCAL" />
       <updated>1622325520548</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Fix bugs">
+      <created>1622661076568</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1622661076568</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -281,6 +242,7 @@
     <MESSAGE value="Add select with index logic" />
     <MESSAGE value="Complete select" />
     <MESSAGE value="Merge" />
-    <option name="LAST_COMMIT_MESSAGE" value="Merge" />
+    <MESSAGE value="Fix bugs" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix bugs" />
   </component>
 </project>

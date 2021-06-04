@@ -309,13 +309,13 @@ public class Table implements Serializable {
             Page newPage = pages.get(insertionIndex).split();
             pages.add(insertionIndex + 1, newPage);
             int tupleIndex = pages.get(insertionIndex).searchForTuple(row.getPK());
-            boolean insertedInNewPage = tupleIndex == -1 ? true : false;
 
-            if (!insertedInNewPage)
-                populateRowIndex(row, pages.get(insertionIndex).getFileName());
+            String oldPageName = pages.get(insertionIndex).getFileName();
             String newPageName = newPage.getFileName();
+
+            populateRowIndex(row, oldPageName);
             for (Tuple tuple : newPage.loadAndGetData())
-                populateRowIndex(tuple, newPageName);
+                updatePageRowIndex(tuple, oldPageName, newPageName);
         } else {
             Page insertionPage = pages.get(insertionIndex);
             insertionPage.add(row);
@@ -361,6 +361,17 @@ public class Table implements Serializable {
             closeTable();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void updatePageRowIndex(Tuple updatedTuple, String oldPageName, String newPageName) {
+        for (GridIndex index : indices) {
+            Vector<Comparable> tupleValues = updatedTuple.getTupleData();
+            Vector<Comparable> newValues = new Vector<Comparable>();
+            for (String indexColumn : index.getColumns()) {
+                newValues.add(tupleValues.get(colNameId.get(indexColumn)));
+            }
+            index.updateTuplePage(newValues, oldPageName, newPageName);
         }
     }
 

@@ -77,4 +77,23 @@ public class Bucket implements Serializable {
             e.printStackTrace();
         }
     }
+
+    public void updatePage(BucketPair updatedTuple, String newPageName) {
+        try {
+            loadBucket();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (pages.contains(updatedTuple)) {
+            pages.get(pages.indexOf(updatedTuple)).setPage(newPageName);
+        } else
+            nextBucket.updatePage(updatedTuple, newPageName);
+
+        try {
+            closeBucket();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

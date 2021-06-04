@@ -90,6 +90,23 @@ public class GridIndex implements Serializable {
         deleteFromGridRec(nextObject, rangeIndices, values, curDimension + 1, maxDimension, pageName);
     }
 
+    public void updateTuplePage(Vector<Comparable> values, String oldPageName, String newPageName) {
+        Vector<Integer> indices = getRangeIndicesFromValues(values);
+        updatePageInGridRec(grid, indices, values, 1, dimension, oldPageName, newPageName);
+    }
+
+    private void updatePageInGridRec(Object grid, Vector<Integer> rangeIndices, Vector<Comparable> values, int curDimension, int maxDimension, String oldPageName, String newPageName) {
+        Object[] array = (Object[]) grid;
+        Object nextObject = array[rangeIndices.get(curDimension - 1)];
+        if(curDimension == maxDimension) {
+            if(nextObject == null)
+                nextObject = array[rangeIndices.get(curDimension - 1)] = new Bucket();
+            BucketPair deletedTuple = new BucketPair(values, oldPageName);
+            ((Bucket)nextObject).updatePage(deletedTuple, newPageName);
+            return;
+        }
+        updatePageInGridRec(nextObject, rangeIndices, values, curDimension + 1, maxDimension, oldPageName, newPageName);
+    }
 
     public boolean equals(String[] columns) {
         if(this.columns.length != columns.length)
@@ -103,7 +120,6 @@ public class GridIndex implements Serializable {
     public String[] getColumns() {
         return columns;
     }
-
 
     public HashSet<String> select(Hashtable<String,Range> colNameToRange) throws IOException, ClassNotFoundException {
 

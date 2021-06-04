@@ -96,15 +96,17 @@ public class Page implements Serializable {
 
     public void update(Comparable key, Hashtable<Integer, Comparable> colNameVal) {
 
+
+
+        int id = searchForTuple(key) ;
+
+        if (id == -1) return;
+
         try {
             loadPage();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        int id = searchForTuple(key) ;
-
-        if (id == -1) return;
 
         for (Map.Entry<Integer, Comparable> e : colNameVal.entrySet()) {
             data.get(id).getTupleData().set(e.getKey(), e.getValue());
@@ -120,6 +122,7 @@ public class Page implements Serializable {
 
     public Tuple getTuple (Comparable key) {
         return data.get(searchForTuple(key)) ;
+
     }
     public int searchForTuple (Comparable key) {
         try {

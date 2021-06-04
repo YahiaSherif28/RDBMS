@@ -121,12 +121,13 @@ public class Page implements Serializable {
     }
 
     public Tuple getTuple (Comparable key) {
+        int id = searchForTuple(key);
         try {
             loadPage();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Tuple ret = data.get(searchForTuple(key));
+        Tuple ret = data.get(id);
         try {
             closePage();
         } catch (IOException e) {

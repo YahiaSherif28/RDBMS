@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1bacc2ee-069a-4fec-a21b-516da4de8106" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Page.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Page.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -116,7 +115,7 @@
       <workItem from="1622118278560" duration="10486000" />
       <workItem from="1622325225293" duration="3066000" />
       <workItem from="1622652940973" duration="2916000" />
-      <workItem from="1622825631552" duration="7154000" />
+      <workItem from="1622825631552" duration="7266000" />
     </task>
     <task id="LOCAL-00001" summary="Fix problems with converting from String to Date">
       <created>1619441009263</created>
@@ -223,7 +222,14 @@
       <option name="project" value="LOCAL" />
       <updated>1622834637751</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Fix bugs">
+      <created>1622834848402</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1622834848402</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

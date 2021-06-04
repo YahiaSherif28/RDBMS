@@ -4,35 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1bacc2ee-069a-4fec-a21b-516da4de8106" name="Default Changelist" comment="Fix bugs">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="1bacc2ee-069a-4fec-a21b-516da4de8106" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Page.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/nextBucketName.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/nextBucketName.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/nextPageName.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/nextPageName.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/1.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/10.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/11.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/12.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/2.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/3.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/4.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/5.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/6.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/7.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/8.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/9.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/tables/courses.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/tables/pcs.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/tables/students.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/tables/transcripts.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/metadata.csv" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/metadata.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/DBAppException.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/DBAppException.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/DBAppInterface.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/DBAppInterface.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Page.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Page.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Tuple.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Tuple.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/metadata.csv" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/metadata.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/Milestone1Tests.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/Milestone1Tests.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Page.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Page.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -142,7 +116,7 @@
       <workItem from="1622118278560" duration="10486000" />
       <workItem from="1622325225293" duration="3066000" />
       <workItem from="1622652940973" duration="2916000" />
-      <workItem from="1622825631552" duration="6753000" />
+      <workItem from="1622825631552" duration="7154000" />
     </task>
     <task id="LOCAL-00001" summary="Fix problems with converting from String to Date">
       <created>1619441009263</created>
@@ -242,7 +216,14 @@
       <option name="project" value="LOCAL" />
       <updated>1622661076568</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Fix bugs">
+      <created>1622834637751</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1622834637751</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

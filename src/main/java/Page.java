@@ -55,7 +55,9 @@ public class Page implements Serializable {
 
     public void loadPage() throws IOException, ClassNotFoundException {
         ObjectInputStream oi = new ObjectInputStream(new FileInputStream(fileName));
+        System.out.println(fileName );
         data = (Vector<Tuple>) oi.readObject();
+        System.out.println(data+"  data loaded from "+ fileName);
         oi.close();
     }
 
@@ -121,7 +123,20 @@ public class Page implements Serializable {
     }
 
     public Tuple getTuple (Comparable key) {
-        return data.get(searchForTuple(key)) ;
+        try {
+            loadPage();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Tuple ret = data.get(searchForTuple(key));
+        try {
+            closePage();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return ret ;
+
+
 
     }
     public int searchForTuple (Comparable key) {

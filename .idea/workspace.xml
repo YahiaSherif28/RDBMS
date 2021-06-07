@@ -4,8 +4,27 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1bacc2ee-069a-4fec-a21b-516da4de8106" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/Page.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Page.java" afterDir="false" />
+    <list default="true" id="1bacc2ee-069a-4fec-a21b-516da4de8106" name="Default Changelist" comment="Fix bugs">
+      <change afterPath="$PROJECT_DIR$/example.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/grammers/SQLiteLexer.g4" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/grammers/SQLiteParser.g4" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/antlr4-4.9.1.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/SQLiteLexer.interp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/SQLiteLexer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/SQLiteLexer.tokens" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/SQLiteParser.interp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/SQLiteParser.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/SQLiteParser.tokens" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/SQLiteParserBaseListener.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/SQLiteParserBaseVisitor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/SQLiteParserListener.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/SQLiteParserVisitor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_hamcrest_hamcrest_core_1_3.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_hamcrest_hamcrest_core_1_3.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DB2Project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/DB2Project.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/DBApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/DBApp.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,23 +42,30 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1rfQHiGDNBlCZoKJF4x4S9VDgiC" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/grammers" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="project.structure.last.edited" value="SDKs" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\M\IdeaProjects\RDBMS\src\main\java" />
+      <recent name="C:\Users\M\IdeaProjects\RDBMS\lib" />
+      <recent name="C:\Users\M\IdeaProjects\RDBMS\grammers" />
       <recent name="$PROJECT_DIR$/src/main/resources" />
     </key>
   </component>
@@ -248,6 +274,7 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Fix problems with converting from String to Date" />
     <MESSAGE value="Move all data file to the data directory" />
     <MESSAGE value="Bug fix" />

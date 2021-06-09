@@ -246,46 +246,41 @@ public class DBApp implements DBAppInterface {
 
     public static void main(String[] args) throws IOException {
 
-        // first download the antlr and sql plugins
 
-        String sql = "SELECT log AS x FROM t1 \n" +
-                "GROUP BY x                   \n" +
-                "HAVING count(*) >= 4         \n" +
-                "ORDER BY max(n) + 0          \n";
+    }
 
-        sql = "SELECT name\n" +              /// other test
-                "FROM Course\n" +
-                "WHERE id = 1" ;
+    public Iterator parseSQL(StringBuffer strbufSQL) throws
+            DBAppException {
 
+        CharStream charStream = CharStreams.fromString(strbufSQL.toString());
 
-        CharStream charStream = CharStreams.fromFileName("example.sql");
         SQLiteLexer sqLiteLexer = new SQLiteLexer(charStream);
-        CommonTokenStream commonTokenStream = new CommonTokenStream(sqLiteLexer) ;
-        SQLiteParser sqLiteParser = new SQLiteParser(commonTokenStream) ;
+        CommonTokenStream commonTokenStream = new CommonTokenStream(sqLiteLexer);
+        SQLiteParser sqLiteParser = new SQLiteParser(commonTokenStream);
 
 
-        ParseTree tree = sqLiteParser.select_stmt();  /// try to change the .select_stmt() method to figure what other methods sqLiteParser contains
-
+        ParseTree tree = sqLiteParser.parse();  /// try to change the .select_stmt() method to figure what other methods sqLiteParser contains
+        System.out.println(Arrays.toString(sqLiteParser.getRuleNames()));
         // Walk the `select_stmt` production and listen when the parser
         // enters the `expr` production.
 
         final List<String> functionNames = new ArrayList<String>();
 
-        ParseTreeWalker.DEFAULT.walk(new SQLiteParserBaseListener(){
+        ParseTreeWalker.DEFAULT.walk(new SQLiteParserBaseListener() {
+
 
             @Override
-            public void enterExpr(@NotNull SQLiteParser.ExprContext ctx) {
-                                                              // Check if the expression is a function call.
-                if (ctx.function_name() != null) {
-                                                              // Yes, it was a function call: add the name of the function
-
-                    System.out.println("zzzz");
-                    functionNames.add(ctx.expr().toString());
-                }
+            public void enterSql_stmt(SQLiteParser.Sql_stmtContext ctx) {
+                
             }
-        }, tree);
 
-        System.out.println("functionNames=" + functionNames);
+            @Override
+            public void enterSelect_stmt(SQLiteParser.Select_stmtContext ctx) {
+                System.out.println(ctx.select_core(0).table_or_subquery(0).table_name().getText());
+                System.out.println("DDDDDD " + ctx.select_core(0).result_column(0).expr().column_name().any_name().IDENTIFIER());
+            }
+
+        }, tree);
 
     }
 

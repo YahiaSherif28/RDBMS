@@ -97,8 +97,7 @@ public class Page implements Serializable {
     public void update(Comparable key, Hashtable<Integer, Comparable> colNameVal) {
 
 
-
-        int id = searchForTuple(key) ;
+        int id = searchForTuple(key);
 
         if (id == -1) return;
 
@@ -120,8 +119,11 @@ public class Page implements Serializable {
         }
     }
 
-    public Tuple getTuple (Comparable key) {
+    public Tuple getTuple(Comparable key) throws DBAppException {
         int id = searchForTuple(key);
+        if (id == -1) {
+            return null;
+        }
         try {
             loadPage();
         } catch (Exception e) {
@@ -133,12 +135,12 @@ public class Page implements Serializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return ret ;
-
+        return ret;
 
 
     }
-    public int searchForTuple (Comparable key) {
+
+    public int searchForTuple(Comparable key) {
         try {
             loadPage();
         } catch (Exception e) {
@@ -163,7 +165,7 @@ public class Page implements Serializable {
             e.printStackTrace();
         }
 
-        return id ;
+        return id;
     }
 
     public Vector<Tuple> deleteTuples(Hashtable<Integer, Comparable> colNameVal) {
@@ -173,14 +175,14 @@ public class Page implements Serializable {
             e.printStackTrace();
         }
         Vector<Tuple> newData = new Vector<>();
-        Vector<Tuple> deletedTuples = new Vector<Tuple>() ;
+        Vector<Tuple> deletedTuples = new Vector<Tuple>();
         for (Tuple t : data) {
             boolean f = true;
             for (Map.Entry<Integer, Comparable> e : colNameVal.entrySet()) {
                 f &= t.getTupleData().get(e.getKey()).compareTo(e.getValue()) == 0;
             }
             if (!f) newData.add(t);
-            else deletedTuples.add(t) ;
+            else deletedTuples.add(t);
         }
 
         data = newData;
@@ -189,7 +191,7 @@ public class Page implements Serializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return deletedTuples ;
+        return deletedTuples;
     }
 
     public boolean isFull() {
@@ -219,7 +221,7 @@ public class Page implements Serializable {
         return sb.toString();
     }
 
-    public Vector<Tuple> select(SQLTerm[] sqlTerms, String[] arrayOperators , TreeMap<String,Integer> colNameId) throws DBAppException, IOException {
+    public Vector<Tuple> select(SQLTerm[] sqlTerms, String[] arrayOperators, TreeMap<String, Integer> colNameId) throws DBAppException, IOException {
         try {
             loadPage();
         } catch (IOException e) {
@@ -228,74 +230,85 @@ public class Page implements Serializable {
             e.printStackTrace();
         }
         Vector<Tuple> ret = new Vector<>();
-        for (Tuple t : this.data){
-            if(seprateOr(sqlTerms,arrayOperators,0,sqlTerms.length-1 , t , colNameId)) ret.add(t);
+        for (Tuple t : this.data) {
+            if (seprateOr(sqlTerms, arrayOperators, 0, sqlTerms.length - 1, t, colNameId)) ret.add(t);
         }
         closePage();
         return ret;
     }
 
-    public boolean seprateOr(SQLTerm[] sqlTerms, String[] arrayOperators , int start , int end,Tuple t , TreeMap<String,Integer> colNameId) throws DBAppException {
-        for (int i =start; i<end; i++ ){
-            if(arrayOperators[i].equals("OR")){
-                return seprateXor(sqlTerms,arrayOperators,start,i,t ,colNameId)||seprateOr(sqlTerms,arrayOperators,i+1,end,t , colNameId);
+    public boolean seprateOr(SQLTerm[] sqlTerms, String[] arrayOperators, int start, int end, Tuple t, TreeMap<String, Integer> colNameId) throws DBAppException {
+        for (int i = start; i < end; i++) {
+            if (arrayOperators[i].equals("OR")) {
+                return seprateXor(sqlTerms, arrayOperators, start, i, t, colNameId) || seprateOr(sqlTerms, arrayOperators, i + 1, end, t, colNameId);
             }
         }
-        return seprateXor(sqlTerms,arrayOperators,start,end,t,colNameId);
+        return seprateXor(sqlTerms, arrayOperators, start, end, t, colNameId);
     }
 
-    public boolean seprateAnd(SQLTerm[] sqlTerms, String[] arrayOperators , int start , int end,Tuple t , TreeMap<String,Integer> colNameId) throws DBAppException {
-        for (int i =start; i<end; i++ ){
-            if(arrayOperators[i].equals("AND")){
-                return checkTerm(sqlTerms,arrayOperators,start,i,t ,colNameId)&&seprateAnd(sqlTerms,arrayOperators,i+1,end,t , colNameId);
+    public boolean seprateAnd(SQLTerm[] sqlTerms, String[] arrayOperators, int start, int end, Tuple t, TreeMap<String, Integer> colNameId) throws DBAppException {
+        for (int i = start; i < end; i++) {
+            if (arrayOperators[i].equals("AND")) {
+                return checkTerm(sqlTerms, arrayOperators, start, i, t, colNameId) && seprateAnd(sqlTerms, arrayOperators, i + 1, end, t, colNameId);
             }
         }
-        return checkTerm(sqlTerms,arrayOperators,start,end,t,colNameId);
+        return checkTerm(sqlTerms, arrayOperators, start, end, t, colNameId);
     }
 
-    public boolean seprateXor(SQLTerm[] sqlTerms, String[] arrayOperators , int start , int end,Tuple t , TreeMap<String,Integer> colNameId) throws DBAppException {
-        for (int i =start; i<end; i++ ){
-            if(arrayOperators[i].equals("XOR")){
-                return seprateAnd(sqlTerms,arrayOperators,start,i,t ,colNameId)^seprateXor(sqlTerms,arrayOperators,i+1,end,t , colNameId);
+    public boolean seprateXor(SQLTerm[] sqlTerms, String[] arrayOperators, int start, int end, Tuple t, TreeMap<String, Integer> colNameId) throws DBAppException {
+        for (int i = start; i < end; i++) {
+            if (arrayOperators[i].equals("XOR")) {
+                return seprateAnd(sqlTerms, arrayOperators, start, i, t, colNameId) ^ seprateXor(sqlTerms, arrayOperators, i + 1, end, t, colNameId);
             }
         }
-        return seprateAnd(sqlTerms,arrayOperators,start,end,t,colNameId);
+        return seprateAnd(sqlTerms, arrayOperators, start, end, t, colNameId);
     }
 
-    public boolean checkTerm(SQLTerm[] sqlTerms, String[] arrayOperators , int start , int end,Tuple t , TreeMap<String,Integer> colNameId) throws DBAppException {
-        if(start!=end ){
+    public boolean checkTerm(SQLTerm[] sqlTerms, String[] arrayOperators, int start, int end, Tuple t, TreeMap<String, Integer> colNameId) throws DBAppException {
+        if (start != end) {
             throw new DBAppException("ERROR IN SEPRATING");
         }
-        return evaluate(sqlTerms[start] , t , colNameId );
+        return evaluate(sqlTerms[start], t, colNameId);
     }
 
-    public boolean evaluate(SQLTerm sqlTerm , Tuple t , TreeMap<String,Integer> colNameId) throws DBAppException {
-        if(sqlTerm._strOperator.equals("=")) return equal((Comparable) sqlTerm._objValue,t.getTupleData().get(colNameId.get(sqlTerm._strColumnName)));
-        if(sqlTerm._strOperator.equals("<")) return lessThan((Comparable)sqlTerm._objValue,t.getTupleData().get(colNameId.get(sqlTerm._strColumnName)));
-        if(sqlTerm._strOperator.equals(">")) return moreThan((Comparable)sqlTerm._objValue,t.getTupleData().get(colNameId.get(sqlTerm._strColumnName)));
-        if(sqlTerm._strOperator.equals("<=")) return lessThanOrEqual((Comparable)sqlTerm._objValue,t.getTupleData().get(colNameId.get(sqlTerm._strColumnName)));
-        if(sqlTerm._strOperator.equals(">=")) return moreThanOrEqual((Comparable)sqlTerm._objValue,t.getTupleData().get(colNameId.get(sqlTerm._strColumnName)));
-        if(sqlTerm._strOperator.equals("!=")) return notEqual((Comparable)sqlTerm._objValue,t.getTupleData().get(colNameId.get(sqlTerm._strColumnName)));
+    public boolean evaluate(SQLTerm sqlTerm, Tuple t, TreeMap<String, Integer> colNameId) throws DBAppException {
+        if (sqlTerm._strOperator.equals("="))
+            return equal((Comparable) sqlTerm._objValue, t.getTupleData().get(colNameId.get(sqlTerm._strColumnName)));
+        if (sqlTerm._strOperator.equals("<"))
+            return lessThan((Comparable) sqlTerm._objValue, t.getTupleData().get(colNameId.get(sqlTerm._strColumnName)));
+        if (sqlTerm._strOperator.equals(">"))
+            return moreThan((Comparable) sqlTerm._objValue, t.getTupleData().get(colNameId.get(sqlTerm._strColumnName)));
+        if (sqlTerm._strOperator.equals("<="))
+            return lessThanOrEqual((Comparable) sqlTerm._objValue, t.getTupleData().get(colNameId.get(sqlTerm._strColumnName)));
+        if (sqlTerm._strOperator.equals(">="))
+            return moreThanOrEqual((Comparable) sqlTerm._objValue, t.getTupleData().get(colNameId.get(sqlTerm._strColumnName)));
+        if (sqlTerm._strOperator.equals("!="))
+            return notEqual((Comparable) sqlTerm._objValue, t.getTupleData().get(colNameId.get(sqlTerm._strColumnName)));
         throw (new DBAppException("Invalid strOperator"));
     }
 
-    public  boolean equal( Comparable val , Comparable tupleVal){
-        return tupleVal.compareTo(val)==0;
+    public boolean equal(Comparable val, Comparable tupleVal) {
+        return tupleVal.compareTo(val) == 0;
     }
-    public  boolean lessThan( Comparable val , Comparable tupleVal){
-        return tupleVal.compareTo(val)<0;
+
+    public boolean lessThan(Comparable val, Comparable tupleVal) {
+        return tupleVal.compareTo(val) < 0;
     }
-    public  boolean moreThan( Comparable val , Comparable tupleVal){
-        return tupleVal.compareTo(val)>0;
+
+    public boolean moreThan(Comparable val, Comparable tupleVal) {
+        return tupleVal.compareTo(val) > 0;
     }
-    public  boolean lessThanOrEqual( Comparable val , Comparable tupleVal){
-        return tupleVal.compareTo(val)<=0;
+
+    public boolean lessThanOrEqual(Comparable val, Comparable tupleVal) {
+        return tupleVal.compareTo(val) <= 0;
     }
-    public  boolean moreThanOrEqual( Comparable val , Comparable tupleVal){
-        return tupleVal.compareTo(val)>=0;
+
+    public boolean moreThanOrEqual(Comparable val, Comparable tupleVal) {
+        return tupleVal.compareTo(val) >= 0;
     }
-    public  boolean notEqual( Comparable val , Comparable tupleVal){
-        return tupleVal.compareTo(val)!=0;
+
+    public boolean notEqual(Comparable val, Comparable tupleVal) {
+        return tupleVal.compareTo(val) != 0;
     }
 
 }

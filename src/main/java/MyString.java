@@ -22,6 +22,11 @@ public class MyString implements Comparable<MyString>, Serializable {
         return ret;
     }
 
+    public boolean equals(Object o) {
+        MyString s = (MyString) o;
+        return s.toString().equals(this.toString());
+    }
+
     public int compareTo(MyString string) {
         return this.s.compareTo(string.s);
     }

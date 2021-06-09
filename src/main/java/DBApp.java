@@ -245,8 +245,14 @@ public class DBApp implements DBAppInterface {
     }
 
     public static void main(String[] args) throws IOException {
-
-
+        DBApp db = new DBApp();
+        StringBuffer sb = new StringBuffer();
+        sb.append("SELECT A FROM B");
+        try {
+            db.parseSQL(sb);
+        } catch (DBAppException e) {
+            e.printStackTrace();
+        }
     }
 
     public Iterator parseSQL(StringBuffer strbufSQL) throws
@@ -268,20 +274,19 @@ public class DBApp implements DBAppInterface {
 
         ParseTreeWalker.DEFAULT.walk(new SQLiteParserBaseListener() {
 
-
             @Override
             public void enterSql_stmt(SQLiteParser.Sql_stmtContext ctx) {
-                
+
             }
 
             @Override
             public void enterSelect_stmt(SQLiteParser.Select_stmtContext ctx) {
                 System.out.println(ctx.select_core(0).table_or_subquery(0).table_name().getText());
-                System.out.println("DDDDDD " + ctx.select_core(0).result_column(0).expr().column_name().any_name().IDENTIFIER());
+                System.out.println(ctx.select_core(0).result_column(0).expr());
             }
 
         }, tree);
-
+        return null;
     }
 
     public String toString() {

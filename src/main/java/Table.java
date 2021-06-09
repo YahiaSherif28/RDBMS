@@ -253,12 +253,16 @@ public class Table implements Serializable {
         }
     }
 
-    private void updateIndex(String clusteringKeyValue, Hashtable<String, Object> columnNameValue) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+    private void updateIndex(String clusteringKeyValue, Hashtable<String, Object> columnNameValue) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException, DBAppException {
 
         String type = colTypes.get(indexOfClusteringKey);               // we can use select * where pk = clusteringKeyValue
         Comparable key = stringToComparable(clusteringKeyValue, type);
         Page oldPage = pages.get(binarySearch(key));
-        Vector<Comparable> tupleValues = oldPage.getTuple(key).getTupleData();
+        Tuple t = oldPage.getTuple(key);
+        if (t == null) {
+            return;
+        }
+        Vector<Comparable> tupleValues = t.getTupleData();
 
         for (GridIndex index : indices) {                                        // get the involved indices
             Vector<Comparable> oldColumnsValues = new Vector<Comparable>();

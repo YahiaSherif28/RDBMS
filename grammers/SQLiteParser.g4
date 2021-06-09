@@ -47,23 +47,23 @@ sql_stmt: (EXPLAIN_ (QUERY_ PLAN_)?)? (
         | attach_stmt
         | begin_stmt
         | commit_stmt
-        | create_index_stmt
-        | create_table_stmt
+        | create_index_stmt // TODO: Implement
+        | create_table_stmt // TODO: Implement
         | create_trigger_stmt
         | create_view_stmt
         | create_virtual_table_stmt
-        | delete_stmt
+        | delete_stmt // TODO: Implement
         | delete_stmt_limited
         | detach_stmt
         | drop_stmt
-        | insert_stmt
+        | insert_stmt // TODO: Implement
         | pragma_stmt
         | reindex_stmt
         | release_stmt
         | rollback_stmt
         | savepoint_stmt
-        | select_stmt
-        | update_stmt
+        | select_stmt // TODO: Implement
+        | update_stmt // TODO: Implement
         | update_stmt_limited
         | vacuum_stmt
     )

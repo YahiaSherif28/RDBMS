@@ -1,14 +1,13 @@
 import org.junit.jupiter.api.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.PrintWriter;
-import java.util.Arrays;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
-
+import java.util.stream.Collectors;
 
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -32,6 +31,35 @@ public class Milestone2Tests {
 
     @Test
     @Order(2)
+    public void testDataDirectory() throws Exception {
+        DBApp dbApp = new DBApp();
+        dbApp.init();
+
+        String dataDirPath = "src/main/resources/data";
+        File dataDir = new File(dataDirPath);
+
+        if (!dataDir.isDirectory() || !dataDir.exists()) {
+            throw new Exception("`data` Directory in Resources folder does not exist");
+        }
+
+        ArrayList<String> files = new ArrayList<>();
+        try {
+            files = Files.walk(Paths.get(dataDirPath))
+                    .map(f -> f.toAbsolutePath().toString())
+                    .filter(p -> !Files.isDirectory(Paths.get(p)))
+                    .collect(Collectors.toCollection(ArrayList::new));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        System.out.println(files);
+        for (String file : files) {
+            Files.delete(Paths.get(file));
+        }
+    }
+
+    @Test
+    @Order(3)
     public void testTableCreation() throws Exception {
         DBApp dbApp = new DBApp();
         dbApp.init();
@@ -45,7 +73,7 @@ public class Milestone2Tests {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     public void testRecordInsertions() throws Exception {
         DBApp dbApp = new DBApp();
         dbApp.init();
@@ -273,8 +301,6 @@ public class Milestone2Tests {
         String[]strarrOperators = new String[1];
         strarrOperators[0] = "AND";
 // select * from Student where name = “John Noor” or gpa = 1.5;
-        System.out.println(Arrays.toString(arrSQLTerms));
-        System.out.println(Arrays.toString(strarrOperators));
         DBApp dbApp = new DBApp();
         dbApp.init();
         Iterator resultSet = dbApp.selectFromTable(arrSQLTerms , strarrOperators);

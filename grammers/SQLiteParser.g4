@@ -47,7 +47,7 @@ sql_stmt: (EXPLAIN_ (QUERY_ PLAN_)?)? (
         | attach_stmt
         | begin_stmt
         | commit_stmt
-        | create_index_stmt // TODO: Implement
+        | create_index_stmt
         | create_table_stmt // TODO: Implement
         | create_trigger_stmt
         | create_view_stmt

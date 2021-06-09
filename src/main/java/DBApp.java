@@ -247,7 +247,7 @@ public class DBApp implements DBAppInterface {
     public static void main(String[] args) throws IOException {
         DBApp db = new DBApp();
         StringBuffer sb = new StringBuffer();
-        sb.append("SELECT A FROM B");
+        sb.append("CREATE INDEX X ON A (B,C,D)");
         try {
             db.parseSQL(sb);
         } catch (DBAppException e) {
@@ -283,6 +283,22 @@ public class DBApp implements DBAppInterface {
             public void enterSelect_stmt(SQLiteParser.Select_stmtContext ctx) {
                 System.out.println(ctx.select_core(0).table_or_subquery(0).table_name().getText());
                 System.out.println(ctx.select_core(0).result_column(0).expr());
+            }
+
+            @Override
+            public void enterCreate_index_stmt(SQLiteParser.Create_index_stmtContext ctx) {
+                String tableName = ctx.table_name().getText();
+                String[] columnNames = new String[ctx.indexed_column().size()];
+                int idx = 0;
+                for (var x : ctx.indexed_column()) {
+                    columnNames[idx++] = x.getText();
+                }
+
+                try {
+                    createIndex(tableName, columnNames);
+                } catch (DBAppException e) {
+                    e.printStackTrace();
+                }
             }
 
         }, tree);

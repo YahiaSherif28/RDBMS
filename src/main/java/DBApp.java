@@ -8,6 +8,8 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.sql.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -401,6 +403,23 @@ public class DBApp implements DBAppInterface {
                 try {
                     //System.out.println(tableName+" "+id+" "+columnNamesAndTypes+" "+maxValues+" "+maxValues);
                     createTable(tableName,id,columnNamesAndTypes,minValues,maxValues);
+                } catch (DBAppException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void enterUpdate_stmt(SQLiteParser.Update_stmtContext ctx) {
+                String tableName = ctx.qualified_table_name().getText();
+                Hashtable<String, Object> updatedValues = new Hashtable<>();
+                int size = ctx.column_name().size() - 1;
+                for(int i = 0; i < size; i++) {
+                    String columnName = ctx.column_name().get(i).getText();
+                    updatedValues.put(columnName, getObject(tableName, columnName, ctx.expr().get(i).getText()));
+                }
+                String clusteringKeyValue = ctx.expr().get(size).getText();
+                try {
+                    updateTable(tableName, clusteringKeyValue, updatedValues);
                 } catch (DBAppException e) {
                     e.printStackTrace();
                 }

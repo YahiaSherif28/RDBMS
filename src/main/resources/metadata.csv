@@ -1,15 +1,15 @@
-students,gpa,java.lang.Double,False,False,0.7,5.0
-students,last_name,MyString,False,False,AAAAAA,zzzzzz
-students,first_name,MyString,False,False,AAAAAA,zzzzzz
-students,dob,java.util.Date,False,False,1990 01 01,2000 12 31
-students,id,MyString,True,False,43-0000,99-9999
+students,gpa,java.lang.Double,False,True,0.7,5.0
+students,last_name,MyString,False,True,AAAAAA,zzzzzz
+students,first_name,MyString,False,True,AAAAAA,zzzzzz
+students,dob,java.util.Date,False,True,1990 01 01,2000 12 31
+students,id,MyString,True,True,43-0000,99-9999
 courses,hours,java.lang.Integer,False,False,1,24
-courses,date_added,java.util.Date,True,False,1901 01 01,2020 12 31
+courses,date_added,java.util.Date,True,True,1901 01 01,2020 12 31
 courses,course_id,MyString,False,False,0000,9999
 courses,course_name,MyString,False,False,AAAAAA,zzzzzz
-transcripts,gpa,java.lang.Double,True,False,0.7,5.0
-transcripts,date_passed,java.util.Date,False,False,1990 01 01,2020 12 31
-transcripts,course_name,MyString,False,False,AAAAAA,zzzzzz
+transcripts,gpa,java.lang.Double,True,True,0.7,5.0
+transcripts,date_passed,java.util.Date,False,True,1990 01 01,2020 12 31
+transcripts,course_name,MyString,False,True,AAAAAA,zzzzzz
 transcripts,student_id,MyString,False,False,43-0000,99-9999
-pcs,pc_id,java.lang.Integer,True,False,0,20000
+pcs,pc_id,java.lang.Integer,True,True,0,20000
 pcs,student_id,MyString,False,False,43-0000,99-9999

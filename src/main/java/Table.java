@@ -19,7 +19,7 @@ public class Table implements Serializable {
     transient private Vector<String> colTypes;
     transient private Vector<Comparable> colMin;
     transient private Vector<Comparable> colMax;
-    transient private Vector<Comparable> colIndex;
+    transient private Vector<Boolean> colIndex;
 
     public Table(String tableName, String clusteringKey, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin, Hashtable<String, String> colNameMax) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
         this.tableName = tableName;
@@ -76,7 +76,8 @@ public class Table implements Serializable {
                     formatter = new SimpleDateFormat("yyyy MM dd");
                     maxString = formatter.format(maxDate);
                 }
-                pw.printf("%s,%s,%s,%s,%s,%s,%s\n", tableName, colNames.get(i), colTypes.get(i), indexOfClusteringKey.equals(i) ? "True" : "False", colIndex.get(i).equals(true) ? "True" : "False", minString, maxString);
+                pw.printf("%s,%s,%s,%s,%s,%s,%s\n", tableName, colNames.get(i), colTypes.get(i), indexOfClusteringKey.equals(i) ? "True" : "False",
+                        colIndex.get(i).equals(Boolean.TRUE) ? "True" : "False", minString, maxString);
             }
             pw.flush();
         } catch (Exception e) {
@@ -112,6 +113,39 @@ public class Table implements Serializable {
                 colMax.add(stringToComparable(column[6], column[2]));
                 colIndex.add(column[4].equals("True") ? true : false);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateMetaData() {
+        Vector<String> metaDataFileContents = new Vector<>();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(METADATA_FILE_PATH));
+            while (br.ready()) {
+                String newRow = br.readLine();
+                String[] column = newRow.split(",");
+                if (!column[0].equals(tableName)) {
+                    metaDataFileContents.add(newRow);
+                    continue;
+                }
+                int columnId = colNameId.get(column[1]);
+                column[4] = colIndex.get(columnId).equals(Boolean.TRUE) ? "True" : "False";
+                metaDataFileContents.add(String.format("%s,%s,%s,%s,%s,%s,%s", column[0], column[1], column[2], column[3], column[4], column[5], column[6]));
+            }
+            br.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(METADATA_FILE_PATH, false)));
+            pw.print("");
+            pw.close();
+            pw = new PrintWriter(new BufferedWriter(new FileWriter(METADATA_FILE_PATH, true)));
+            for(String s : metaDataFileContents)
+                pw.println(s);
+            pw.flush();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -245,6 +279,8 @@ public class Table implements Serializable {
         // update index boolean
         for (int i : colIds)
             colIndex.set(i, true);
+
+        updateMetaData();
 
         try {
             closeTable();

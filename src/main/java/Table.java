@@ -153,6 +153,25 @@ public class Table implements Serializable {
         os.close();
     }
 
+
+    public String getColumnType (String colName) {
+        try {
+            loadTable();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        String type = colTypes.get(colNameId.get(colName)) ;
+        try {
+            closeTable();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return type ;
+    }
+
     public String getTableName() {
         return tableName;
     }
@@ -337,6 +356,8 @@ public class Table implements Serializable {
         for (int i = 0; i < colNames.size(); i++) {
             String colName = colNames.get(i);
             Comparable value = (Comparable) colNameValue.get(colName);
+          //  System.out.println(colNames.get(i));
+           // System.out.println(this.colNames.get(indexOfClusteringKey));
             if (value == null) {
                 if (i == indexOfClusteringKey)
                     throw new DBAppException("No value was inserted for the primary key.");

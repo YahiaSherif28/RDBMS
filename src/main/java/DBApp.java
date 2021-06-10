@@ -8,6 +8,9 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Array;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class DBApp implements DBAppInterface {
@@ -25,7 +28,7 @@ public class DBApp implements DBAppInterface {
     private Vector<Table> tables;
 
     public DBApp() {
-        //init();
+        init();
     }
 
     public static int getMaximumRowsCountinTablePage() {
@@ -247,9 +250,24 @@ public class DBApp implements DBAppInterface {
     public static void main(String[] args) throws IOException {
         DBApp db = new DBApp();
         StringBuffer sb = new StringBuffer();
-        sb.append("CREATE INDEX X ON A (B,C,D)");
+        Scanner sc = new Scanner(System.in);
+
+        while (sc.hasNext()) {
+            sb.append(sc.nextLine());
+        }
+        //sb.append("CREATE TABLE students (id int PRIMARY KEY , name varchar , gpa double )");
+        //sb.append("INSERT INTO students (id , name ,gpa) VALUES (18829 , Khater ,0.5 )");
+       // sb.append("DELETE from students WHERE name = Khater AND gpa = 0.5 AND id = 18829") ;
+       // sb.append("SELECT * from students WHERE gpa >= 0.5 AND id >= 16076 ") ;}
         try {
-            db.parseSQL(sb);
+            Iterator ans = db.parseSQL(sb);
+            if(ans==null) System.out.println("NOT SELECTION");
+            else {
+                while (ans.hasNext()){
+                    System.out.println(ans.next());
+                }
+            }
+       //     System.out.println(ans==null?ans:ans.next());
         } catch (DBAppException e) {
             e.printStackTrace();
         }
@@ -266,10 +284,10 @@ public class DBApp implements DBAppInterface {
 
 
         ParseTree tree = sqLiteParser.parse();  /// try to change the .select_stmt() method to figure what other methods sqLiteParser contains
-        System.out.println(Arrays.toString(sqLiteParser.getRuleNames()));
+        //System.out.println(Arrays.toString(sqLiteParser.getRuleNames()));
         // Walk the `select_stmt` production and listen when the parser
         // enters the `expr` production.
-
+        final Iterator[] ret = {null};
         final List<String> functionNames = new ArrayList<String>();
 
         ParseTreeWalker.DEFAULT.walk(new SQLiteParserBaseListener() {
@@ -281,8 +299,66 @@ public class DBApp implements DBAppInterface {
 
             @Override
             public void enterSelect_stmt(SQLiteParser.Select_stmtContext ctx) {
-                System.out.println(ctx.select_core(0).table_or_subquery(0).table_name().getText());
-                System.out.println(ctx.select_core(0).result_column(0).expr());
+                String tableName = ctx.select_core(0).table_or_subquery(0).table_name().getText() ;
+              //  System.out.println(ctx.select_core().get(0).expr().get(0).expr().get(0).ASSIGN());
+                int size = ctx.select_core().get(0).expr().get(0).expr().size();
+
+                Vector<SQLTerm> ttmp  = new Vector<>();
+                Vector<String> otmp = new Vector<>();
+
+                    SQLiteParser.ExprContext expression = ctx.select_core().get(0).expr().get(0);
+                    //  System.out.println(ctx.select_core().get(0).expr().get(0).getText());
+                    while (expression.AND_()!=null || expression.OR_()!=null) {
+                        String colName = expression.expr().get(1).expr().get(0).getText();
+                        String value = expression.expr().get(1).expr().get(1).getText();
+                        String operand = "";
+                        if (expression.expr().get(1).ASSIGN() != null) operand = "=";
+                        if (expression.expr().get(1).GT_EQ() != null) operand = ">=";
+                        if (expression.expr().get(1).GT() != null) operand = ">";
+                        if (expression.expr().get(1).LT_EQ() != null) operand = "<=";
+                        if (expression.expr().get(1).LT() != null) operand = "<";
+                        if (expression.expr().get(1).NOT_EQ1() != null) operand = "!=";
+                        SQLTerm sqlTerm = new SQLTerm();
+                        sqlTerm._strTableName = tableName;
+                        sqlTerm._strColumnName = colName;
+                        sqlTerm._strOperator = operand;
+                        sqlTerm._objValue = getObject(tableName,colName,value);
+                        ttmp.add(sqlTerm);
+                        String op = expression.AND_()==null?"OR":"AND";
+                        otmp.add(op);
+                        expression = expression.expr().get(0);
+                    //    System.out.println(colName+" "+operand+" "+ value);
+
+                    }
+                String colName = expression.expr().get(0).getText();
+                String value = expression.expr().get(1).getText();
+                String operand = "";
+                if (expression.ASSIGN() != null) operand = "=";
+                if (expression.GT_EQ() != null) operand = ">=";
+                if (expression.GT() != null) operand = ">";
+                if (expression.LT_EQ() != null) operand = "<=";
+                if (expression.LT() != null) operand = "<";
+                if (expression.NOT_EQ1() != null) operand = "!=";
+                SQLTerm sqlTerm = new SQLTerm();
+                sqlTerm._strTableName = tableName;
+                sqlTerm._strColumnName = colName;
+                sqlTerm._strOperator = operand;
+                sqlTerm._objValue = getObject(tableName,colName,value);
+                ttmp.add(sqlTerm);
+              //  System.out.println(colName+" "+operand+" "+ value);
+                SQLTerm[] sqlTerms = new SQLTerm[ttmp.size()];
+                String[] arrayOperators = new String[otmp.size()];
+                for (int i = ttmp.size()-1; i>=0; i--)sqlTerms[ttmp.size()-1-i] = ttmp.get(i);
+                for (int i = otmp.size()-1; i>=0; i--)arrayOperators[otmp.size()-1-i] = otmp.get(i);
+
+//                System.out.println(Arrays.toString(sqlTerms));
+//                System.out.println(Arrays.toString(arrayOperators));
+                try {
+                    ret[0] = selectFromTable(sqlTerms,arrayOperators);
+                } catch (DBAppException e) {
+                    e.printStackTrace();
+                }
+
             }
 
             @Override
@@ -309,28 +385,137 @@ public class DBApp implements DBAppInterface {
                 String id = "";
                 for (var x : ctx.column_def()) {
                     if(x.column_constraint().size()>0){
-                        if(x.column_constraint().get(0).getText().equals("PrimaryKey")) id = x.column_name().getText();
+                       // System.out.println(x.column_constraint().get(0).getText());
+                        if(x.column_constraint().get(0).getText().toLowerCase().equals("primarykey")) id = x.column_name().getText();
                     }
                     columnNamesAndTypes.put(x.column_name().getText(),x.type_name().getText());
                 }
                 Hashtable<String,String> minValues = new Hashtable<>();
                 Hashtable<String,String> maxValues = new Hashtable<>();
                 for (Map.Entry<String,String> r : columnNamesAndTypes.entrySet()){
-                    minValues.put(r.getKey(),getMin(r.getValue()));
-                    maxValues.put(r.getKey(),getMax(r.getValue()));
-                    columnNamesAndTypes.put(r.getKey(),getType(r.getValue()));
+                    minValues.put(r.getKey(),getMin(r.getValue().toLowerCase()));
+                    maxValues.put(r.getKey(),getMax(r.getValue().toLowerCase()));
+                    columnNamesAndTypes.put(r.getKey(),getType(r.getValue().toLowerCase()));
                 }
 
                 try {
-                   // System.out.println(tableName+" "+id+" "+columnNamesAndTypes+" "+maxValues+" "+maxValues);
+                    //System.out.println(tableName+" "+id+" "+columnNamesAndTypes+" "+maxValues+" "+maxValues);
                     createTable(tableName,id,columnNamesAndTypes,minValues,maxValues);
                 } catch (DBAppException e) {
                     e.printStackTrace();
                 }
             }
 
+
+            @Override
+            public void enterInsert_stmt(SQLiteParser.Insert_stmtContext ctx){
+                String tableName = ctx.table_name().getText() ;
+                List<SQLiteParser.Column_nameContext> columnsToInsert = ctx.column_name() ;
+                List<SQLiteParser.ExprContext> insertedValue = ctx.expr() ;
+
+                Table toInsertIn = getTable(tableName);
+
+                if (toInsertIn!=null) {
+                    Hashtable<String, Object> colNameValue = new Hashtable<String, Object>();
+                    for (int i = 0; i < columnsToInsert.size(); i++) {
+                        String col = columnsToInsert.get(i).getText();
+                        String type = toInsertIn.getColumnType(col) ;
+                        switch (type) {
+                            case "MyString" : colNameValue.put(col,insertedValue.get(i).getText());break;
+                            case "java.lang.Integer": colNameValue.put(col,Integer.parseInt(insertedValue.get(i).getText()));break;
+                            case "java.lang.Double" : colNameValue.put(col,Double.parseDouble(insertedValue.get(i).getText()));break;
+                            case "java.util.Date"   : String date = insertedValue.get(i).getText() ;
+                                int year = Integer.parseInt(date.trim().substring(0, 4));
+                                int month = Integer.parseInt(date.trim().substring(5, 7));
+                                int day = Integer.parseInt(date.trim().substring(8));
+                                Date dt = new Date(year, month, day);
+                                colNameValue.put(col,dt) ;
+                                break;
+                        }
+                       // System.out.println(type);
+                    }
+                    //System.out.println(colNameValue);
+                    try {
+                        insertIntoTable(tableName,colNameValue);
+                    } catch (DBAppException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else
+                    try {
+                        throw new DBAppException("This table doesn't exist");
+                    } catch (DBAppException e) {
+                        e.printStackTrace();
+                    }
+
+
+            }
+
+            @Override
+            public void enterDelete_stmt(SQLiteParser.Delete_stmtContext ctx) {
+                String tableName = ctx.qualified_table_name().getText();
+                String expr=ctx.expr().getText();
+               // System.out.println(ctx.expr());
+                ArrayList<String> al=new ArrayList<String>();
+                al=inOrderTraversal(ctx.expr(),al);
+                Hashtable<String,Object> columnNameValue=new Hashtable<>();
+                for (String x:al){
+                    if(x.contains("=")) {
+                        columnNameValue.put(x.split("=")[0], getObject(tableName,x.split("=")[0],x.split("=")[1]));
+                        //  System.out.println(x.split("=")[0]+ " "+ x.split("=")[1]);
+                    }
+                    else
+                        System.out.println("Wrong syntax");
+                }
+                try {
+                    deleteFromTable(tableName,columnNameValue);
+                } catch (DBAppException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
         }, tree);
-        return null;
+     //   System.out.println(ret[0].next());
+        return ret[0];
+    }
+
+    public ArrayList<String> inOrderTraversal(SQLiteParser.ExprContext expr,ArrayList<String> s) {
+        if (expr.expr(0) != null) {
+            inOrderTraversal(expr.expr(0),s);
+
+            if(expr.expr(0).expr(0)==null) {
+                s.add(expr.getText());
+            }
+            inOrderTraversal(expr.expr(1),s);
+        }
+        return s;
+    }
+    public Object getObject(String tableName,String colName,String value){
+        Table t = getTable(tableName);
+        if (t==null) return null;
+        String type = t.getColumnType(colName);
+        Object ret = null;
+        switch (type) {
+            case "MyString" : ret = new MyString(value);break;
+            case "java.lang.Integer": ret = Integer.parseInt(value);break;
+            case "java.lang.Double" :ret = Double.parseDouble(value);break;
+            case "java.util.Date"   : String date = value ;
+                int year = Integer.parseInt(date.trim().substring(0, 4));
+                int month = Integer.parseInt(date.trim().substring(5, 7));
+                int day = Integer.parseInt(date.trim().substring(8));
+                Date dt = new Date(year, month, day);
+                ret =dt ;
+                break;
+        }
+        return ret;
+    }
+
+    public Table getTable (String tableName) {
+        for (Table table : tables )
+            if (table.getTableName().equals(tableName))
+                return table ;
+        return null ;
     }
 
     public String toString() {
@@ -343,21 +528,21 @@ public class DBApp implements DBAppInterface {
         return sb.toString();
     }
       public String getType(String type){
-        if(type.equals("varchar")) return "java.lang.String";
+        if(type.contains("varchar")) return "java.lang.String";
         else if(type.equals("int")) return "java.lang.Integer";
         else if(type.equals("double")) return "java.lang.Double";
         else return "java.util.Date";
     }
     public String getMin(String type){
         DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy G HH:mm:ss Z");
-        if(type.equals("varchar")) return "AAAAAAA";
+        if(type.contains("varchar")) return "AAAAAAA";
         else if(type.equals("int")) return Integer.MIN_VALUE+"";
         else if(type.equals("double")) return Double.MIN_VALUE+"";
         else return df.format(new Date(Long.MIN_VALUE));
     }
     public String getMax(String type){
         DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy G HH:mm:ss Z");
-        if(type.equals("varchar")) return "ZZZZZZZ";
+        if(type.contains("varchar")) return "ZZZZZZZ";
         else if(type.equals("int")) return Integer.MAX_VALUE+"";
         else if(type.equals("double")) return Double.MAX_VALUE+"";
         else return df.format(new Date(Long.MAX_VALUE));

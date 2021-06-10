@@ -292,7 +292,7 @@ public class DBApp implements DBAppInterface {
         // Walk the `select_stmt` production and listen when the parser
         // enters the `expr` production.
         final Iterator[] ret = {null};
-        final List<String> functionNames = new ArrayList<String>();
+        final List<String> functionNames = new Vector<String>();
 
         ParseTreeWalker.DEFAULT.walk(new SQLiteParserBaseListener() {
 
@@ -480,7 +480,7 @@ public class DBApp implements DBAppInterface {
                 String tableName = ctx.qualified_table_name().getText();
                 String expr=ctx.expr().getText();
                // System.out.println(ctx.expr());
-                ArrayList<String> al=new ArrayList<String>();
+                Vector<String> al=new Vector<>();
                 al=inOrderTraversal(ctx.expr(),al);
                 Hashtable<String,Object> columnNameValue=new Hashtable<>();
                 for (String x:al){
@@ -504,7 +504,7 @@ public class DBApp implements DBAppInterface {
         return ret[0];
     }
 
-    public ArrayList<String> inOrderTraversal(SQLiteParser.ExprContext expr,ArrayList<String> s) {
+    public Vector<String> inOrderTraversal(SQLiteParser.ExprContext expr,Vector<String> s) {
         if (expr.expr(0) != null) {
             inOrderTraversal(expr.expr(0),s);
 

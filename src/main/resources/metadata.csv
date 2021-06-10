@@ -1,8 +1,8 @@
-students,gpa,java.lang.Double,False,True,0.7,5.0
+students,gpa,java.lang.Double,False,False,0.7,5.0
 students,last_name,MyString,False,False,AAAAAA,zzzzzz
 students,first_name,MyString,False,False,AAAAAA,zzzzzz
 students,dob,java.util.Date,False,False,1990 01 01,2000 12 31
-students,id,MyString,True,True,43-0000,99-9999
+students,id,MyString,True,False,43-0000,99-9999
 courses,hours,java.lang.Integer,False,False,1,24
 courses,date_added,java.util.Date,True,False,1901 01 01,2020 12 31
 courses,course_id,MyString,False,False,0000,9999

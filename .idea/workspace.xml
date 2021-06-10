@@ -4,18 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1bacc2ee-069a-4fec-a21b-516da4de8106" name="Default Changelist" comment="Fix bugs">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/data/pages/3.ser" afterDir="false" />
+    <list default="true" id="1bacc2ee-069a-4fec-a21b-516da4de8106" name="Default Changelist" comment="parsing stuff">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/antlr4-4.9.1.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/DBApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/DBApp.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Table.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Table.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/data/nextPageName.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/nextPageName.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/1.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/tables.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/tables.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/tables/courses.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/tables/pcs.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/tables/students.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/tables/students.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/data/tables/transcripts.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/data/pages/3.ser" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/data/pages/4.ser" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/data/tables.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/data/tables/students.ser" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/metadata.csv" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/metadata.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/DBApp.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/DBApp.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Table.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Table.class" afterDir="false" />
@@ -93,6 +89,14 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="All in DB2Project" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="DB2Project" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Milestone2Tests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="DB2Project" />
       <option name="PACKAGE_NAME" value="" />
@@ -111,16 +115,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Milestone2TestsModified.testCreateDoubleIndex" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="DB2Project" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="Milestone2TestsModified" />
-      <option name="METHOD_NAME" value="testCreateDoubleIndex" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="Milestone2TestsModified.testCreateStringDoubleIndex" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="DB2Project" />
       <option name="PACKAGE_NAME" value="" />
@@ -134,10 +128,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Application.DBApp" />
+        <item itemvalue="JUnit.All in DB2Project" />
         <item itemvalue="JUnit.Milestone2Tests" />
         <item itemvalue="JUnit.Milestone2TestsModified" />
         <item itemvalue="JUnit.Milestone2TestsModified.testCreateStringDoubleIndex" />
-        <item itemvalue="JUnit.Milestone2TestsModified.testCreateDoubleIndex" />
       </list>
     </recent_temporary>
   </component>
@@ -293,7 +287,14 @@
       <option name="project" value="LOCAL" />
       <updated>1623278185142</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="parsing stuff">
+      <created>1623356828240</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1623356828240</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -325,7 +326,8 @@
     <MESSAGE value="Merge" />
     <MESSAGE value="Add sql parser" />
     <MESSAGE value="Fix bugs" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix bugs" />
+    <MESSAGE value="parsing stuff" />
+    <option name="LAST_COMMIT_MESSAGE" value="parsing stuff" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

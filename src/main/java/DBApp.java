@@ -259,7 +259,9 @@ public class DBApp implements DBAppInterface {
         }
         //sb.append("CREATE TABLE students (id int PRIMARY KEY , name varchar , gpa double )");
         //sb.append("INSERT INTO students (id , name ,gpa) VALUES (18829 , Khater ,0.5 )");
-       // sb.append("DELETE from students WHERE name = Khater AND gpa = 0.5 AND id = 18829") ;
+        // sb.append("DELETE from students WHERE name = Khater AND gpa = 0.5 AND id = 18829") ;
+        //sb.append("CREATE INDEX HOKSHA ON students (id , gpa)");
+        // sb.append("UPDATE  students SET name = Yahia , gpa = 0.6  where id = 16076") ;
        // sb.append("SELECT * from students WHERE gpa >= 0.5 AND id >= 16076 ") ;}
         try {
             Iterator ans = db.parseSQL(sb);
@@ -412,12 +414,15 @@ public class DBApp implements DBAppInterface {
             public void enterUpdate_stmt(SQLiteParser.Update_stmtContext ctx) {
                 String tableName = ctx.qualified_table_name().getText();
                 Hashtable<String, Object> updatedValues = new Hashtable<>();
-                int size = ctx.column_name().size() - 1;
+                int size = ctx.column_name().size() ;
+                System.out.println(size);
                 for(int i = 0; i < size; i++) {
                     String columnName = ctx.column_name().get(i).getText();
+               //     System.out.println(columnName+" "+ctx.expr().get(i).getText());
                     updatedValues.put(columnName, getObject(tableName, columnName, ctx.expr().get(i).getText()));
                 }
-                String clusteringKeyValue = ctx.expr().get(size).getText();
+                String clusteringKeyValue = ctx.expr(size).expr().get(1).getText();
+               // System.out.println(clusteringKeyValue);
                 try {
                     updateTable(tableName, clusteringKeyValue, updatedValues);
                 } catch (DBAppException e) {
@@ -516,7 +521,7 @@ public class DBApp implements DBAppInterface {
         String type = t.getColumnType(colName);
         Object ret = null;
         switch (type) {
-            case "MyString" : ret = new MyString(value);break;
+            case "MyString" : ret = value;break;
             case "java.lang.Integer": ret = Integer.parseInt(value);break;
             case "java.lang.Double" :ret = Double.parseDouble(value);break;
             case "java.util.Date"   : String date = value ;
@@ -554,14 +559,14 @@ public class DBApp implements DBAppInterface {
     }
     public String getMin(String type){
         DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy G HH:mm:ss Z");
-        if(type.contains("varchar")) return "AAAAAAA";
+        if(type.contains("varchar")) return " ";
         else if(type.equals("int")) return Integer.MIN_VALUE+"";
         else if(type.equals("double")) return Double.MIN_VALUE+"";
         else return df.format(new Date(Long.MIN_VALUE));
     }
     public String getMax(String type){
         DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy G HH:mm:ss Z");
-        if(type.contains("varchar")) return "ZZZZZZZ";
+        if(type.contains("varchar")) return "~~~~~~~~~~~~~~~~~~~";
         else if(type.equals("int")) return Integer.MAX_VALUE+"";
         else if(type.equals("double")) return Double.MAX_VALUE+"";
         else return df.format(new Date(Long.MAX_VALUE));

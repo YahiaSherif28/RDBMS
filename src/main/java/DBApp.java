@@ -249,7 +249,7 @@ public class DBApp implements DBAppInterface {
     public static void main(String[] args) throws IOException {
         DBApp db = new DBApp();
         StringBuffer sb = new StringBuffer();
-        sb.append("CREATE INDEX X ON A (B,C,D)");
+        sb.append("UPDATE X SET A = B");
         try {
             db.parseSQL(sb);
         } catch (DBAppException e) {
@@ -268,7 +268,7 @@ public class DBApp implements DBAppInterface {
 
 
         ParseTree tree = sqLiteParser.parse();  /// try to change the .select_stmt() method to figure what other methods sqLiteParser contains
-        System.out.println(Arrays.toString(sqLiteParser.getRuleNames()));
+        //System.out.println(Arrays.toString(sqLiteParser.getRuleNames()));
         // Walk the `select_stmt` production and listen when the parser
         // enters the `expr` production.
 
@@ -283,8 +283,8 @@ public class DBApp implements DBAppInterface {
 
             @Override
             public void enterSelect_stmt(SQLiteParser.Select_stmtContext ctx) {
-                System.out.println(ctx.select_core(0).table_or_subquery(0).table_name().getText());
-                System.out.println(ctx.select_core(0).result_column(0).expr());
+                //.out.println(ctx.select_core(0).table_or_subquery(0).table_name().getText());
+                //System.out.println(ctx.select_core(0).result_column(0).expr());
             }
 
             @Override
@@ -326,6 +326,23 @@ public class DBApp implements DBAppInterface {
                 try {
                    // System.out.println(tableName+" "+id+" "+columnNamesAndTypes+" "+maxValues+" "+maxValues);
                     createTable(tableName,id,columnNamesAndTypes,minValues,maxValues);
+                } catch (DBAppException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void enterUpdate_stmt(SQLiteParser.Update_stmtContext ctx) {
+                String tableName = ctx.qualified_table_name().getText();
+                Hashtable<String, Object> updatedValues = new Hashtable<>();
+                int size = ctx.column_name().size() - 1;
+                for(int i = 0; i < size; i++) {
+                    String columnName = ctx.column_name().get(i).getText();
+                    updatedValues.put(columnName, getObject(tableName, columnName, ctx.expr().get(i).getText()));
+                }
+                String clusteringKeyValue = ctx.expr().get(size).getText();
+                try {
+                    updateTable(tableName, clusteringKeyValue, updatedValues);
                 } catch (DBAppException e) {
                     e.printStackTrace();
                 }

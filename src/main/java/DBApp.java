@@ -300,6 +300,34 @@ public class DBApp implements DBAppInterface {
                     e.printStackTrace();
                 }
             }
+             @Override
+            public void enterCreate_table_stmt(SQLiteParser.Create_table_stmtContext ctx) {
+                String tableName = ctx.table_name().getText();
+                Hashtable<String,String> columnNamesAndTypes = new Hashtable<>();
+
+                int idx = 0;
+                String id = "";
+                for (var x : ctx.column_def()) {
+                    if(x.column_constraint().size()>0){
+                        if(x.column_constraint().get(0).getText().equals("PrimaryKey")) id = x.column_name().getText();
+                    }
+                    columnNamesAndTypes.put(x.column_name().getText(),x.type_name().getText());
+                }
+                Hashtable<String,String> minValues = new Hashtable<>();
+                Hashtable<String,String> maxValues = new Hashtable<>();
+                for (Map.Entry<String,String> r : columnNamesAndTypes.entrySet()){
+                    minValues.put(r.getKey(),getMin(r.getValue()));
+                    maxValues.put(r.getKey(),getMax(r.getValue()));
+                    columnNamesAndTypes.put(r.getKey(),getType(r.getValue()));
+                }
+
+                try {
+                   // System.out.println(tableName+" "+id+" "+columnNamesAndTypes+" "+maxValues+" "+maxValues);
+                    createTable(tableName,id,columnNamesAndTypes,minValues,maxValues);
+                } catch (DBAppException e) {
+                    e.printStackTrace();
+                }
+            }
 
         }, tree);
         return null;
@@ -313,6 +341,26 @@ public class DBApp implements DBAppInterface {
             sb.append("\n");
         }
         return sb.toString();
+    }
+      public String getType(String type){
+        if(type.equals("varchar")) return "java.lang.String";
+        else if(type.equals("int")) return "java.lang.Integer";
+        else if(type.equals("double")) return "java.lang.Double";
+        else return "java.util.Date";
+    }
+    public String getMin(String type){
+        DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy G HH:mm:ss Z");
+        if(type.equals("varchar")) return "AAAAAAA";
+        else if(type.equals("int")) return Integer.MIN_VALUE+"";
+        else if(type.equals("double")) return Double.MIN_VALUE+"";
+        else return df.format(new Date(Long.MIN_VALUE));
+    }
+    public String getMax(String type){
+        DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy G HH:mm:ss Z");
+        if(type.equals("varchar")) return "ZZZZZZZ";
+        else if(type.equals("int")) return Integer.MAX_VALUE+"";
+        else if(type.equals("double")) return Double.MAX_VALUE+"";
+        else return df.format(new Date(Long.MAX_VALUE));
     }
 
 }
